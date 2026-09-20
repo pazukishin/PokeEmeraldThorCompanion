@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="thor_companion_version_name" translatable="false">1.0.0</string>
+    <style name="Theme.ThorCompanion" parent="android:style/Theme.Material.Light.NoActionBar">
+        <item name="android:fontFamily">sans</item>
+        <item name="android:colorAccent">#F4C542</item>
+        <item name="android:windowLightStatusBar">false</item>
+        <item name="android:statusBarColor">#101418</item>
+        <item name="android:navigationBarColor">#101418</item>
+    </style>
+</resources>
