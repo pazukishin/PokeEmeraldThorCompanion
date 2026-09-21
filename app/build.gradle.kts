@@ -16,9 +16,9 @@ val versionProps = Properties().apply {
 
 val appVersionCode = (versionProps.getProperty("VERSION_CODE", "1").toIntOrNull() ?: 1)
 val appVersionName = versionProps.getProperty("VERSION_NAME", "0.1.0")
-val isThorDebug = gradle.startParameter.taskNames.any { it.endsWith("thorDebug", ignoreCase = true) }
-val buildVersionCode = if (isThorDebug) appVersionCode + 1 else appVersionCode
-val buildVersionName = if (isThorDebug) {
+val isThorRelease = gradle.startParameter.taskNames.any { it.endsWith("thorRelease", ignoreCase = true) }
+val buildVersionCode = if (isThorRelease) appVersionCode + 1 else appVersionCode
+val buildVersionName = if (isThorRelease) {
     val parts = appVersionName.split(".").map { it.toIntOrNull() ?: 0 }
     "${parts.getOrElse(0) { 0 }}.${parts.getOrElse(1) { 0 }}.${parts.getOrElse(2) { 0 } + 1}"
 } else appVersionName
@@ -39,6 +39,11 @@ android {
     buildTypes {
         debug {
             isDebuggable = true
+        }
+        release {
+            isDebuggable = false
+            isMinifyEnabled = false
+            signingConfig = signingConfigs.getByName("debug")
         }
     }
 
@@ -102,8 +107,8 @@ tasks.register("bumpVersion") {
     }
 }
 
-tasks.register("thorDebug") {
-    dependsOn("bumpVersion", "assembleDebug")
+tasks.register("thorRelease") {
+    dependsOn("bumpVersion", "assembleRelease")
     doLast {
         val props = Properties().apply {
             if (versionPropsFile.exists()) {
@@ -116,19 +121,20 @@ tasks.register("thorDebug") {
         val releaseDir = file("$rootDir/releases")
         releaseDir.mkdirs()
 
-        val apkDir = file("$rootDir/app/build/outputs/apk/debug")
-        val apkFile = apkDir.listFiles()?.firstOrNull { it.name.endsWith(".apk") }
-            ?: throw GradleException("No APK found in ${apkDir.absolutePath}")
+        val apkFile = file("$rootDir/app/build/outputs/apk/release/app-release.apk")
+        if (!apkFile.exists()) {
+            throw GradleException("No release APK found at ${apkFile.absolutePath}")
+        }
 
-        val outputFile = File(releaseDir, "ThorCompanion-v${versionName}-${versionCode}-debug.apk")
+        val outputFile = File(releaseDir, "ThorCompanion-v${versionName}-${versionCode}.apk")
         apkFile.copyTo(outputFile, overwrite = true)
 
-        println("APK copied to ${outputFile.absolutePath}")
+        println("Release APK copied to ${outputFile.absolutePath}")
     }
 }
 
 tasks.register("buildThorRelease") {
-    dependsOn("thorDebug")
+    dependsOn("thorRelease")
 }
 
 val generateEmeraldWildCatalog = tasks.register("generateEmeraldWildCatalog") {
