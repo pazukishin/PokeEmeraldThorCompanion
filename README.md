@@ -82,6 +82,7 @@ in `tools/`:
 - `generate_item_move_data.py` — generates `items.json` (item names) and `moves.json` (move names).
 - `generate_trainers.py` — generates `trainers.json` (trainer id → name and sprite).
 - `download_sprites.py` — downloads the 386 Pokémon sprites and the item sprites into `assets/pokemon/` and `assets/items/`.
+- `generate_icon.py` — generates the launcher icon (Poké Ball on an emerald gradient) as PNG mipmaps.
 
 ## Changelog
 
