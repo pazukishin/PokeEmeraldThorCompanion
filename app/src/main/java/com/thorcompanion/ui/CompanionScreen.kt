@@ -1,7 +1,9 @@
 package com.thorcompanion.ui
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -12,21 +14,24 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Divider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -34,21 +39,29 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
+import com.thorcompanion.BattleInfo
 import com.thorcompanion.CompanionViewModel
 import com.thorcompanion.CompanionTab
+import com.thorcompanion.PokemonDecoder
+import com.thorcompanion.PokemonInfo
 import com.thorcompanion.CategorizedEncounter
 import com.thorcompanion.ConnectionLog
 import com.thorcompanion.Encounter
 import com.thorcompanion.EncounterCategory
+import com.thorcompanion.EvolutionNode
+import com.thorcompanion.Gender
 import com.thorcompanion.DetailState
 import com.thorcompanion.MapItem
 import com.thorcompanion.PokemonSprite
 import com.thorcompanion.R
+import com.thorcompanion.SpeciesCatalog
 import com.thorcompanion.Trainer
 import com.thorcompanion.TrainerPokemon
 import com.thorcompanion.TrainerSprite
@@ -58,6 +71,13 @@ import com.thorcompanion.ItemSprite
 @Composable
 fun CompanionScreen(viewModel: CompanionViewModel, modifier: Modifier = Modifier) {
     val state by viewModel.state.collectAsState()
+    val selectedTeamMon = remember { mutableStateOf<PokemonInfo?>(null) }
+    val teamEvolution = remember { mutableStateOf<EvolutionNode?>(null) }
+    LaunchedEffect(selectedTeamMon.value?.speciesId) {
+        val speciesId = selectedTeamMon.value?.speciesId
+        teamEvolution.value = null
+        teamEvolution.value = if (speciesId != null) viewModel.loadEvolutionForSpecies(speciesId) else null
+    }
     Box(modifier) {
         Column(modifier.background(MaterialTheme.colorScheme.background).padding(12.dp)) {
             Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
@@ -89,6 +109,11 @@ fun CompanionScreen(viewModel: CompanionViewModel, modifier: Modifier = Modifier
             Spacer(Modifier.height(5.dp))
             if (state.connected) {
                 TabRow(selectedTabIndex = state.selectedTab.ordinal) {
+                    Tab(
+                        selected = state.selectedTab == CompanionTab.TEAM,
+                        onClick = { viewModel.selectTab(CompanionTab.TEAM) },
+                        text = { Text("Equipo", fontSize = 11.sp) }
+                    )
                     Tab(
                         selected = state.selectedTab == CompanionTab.ENCOUNTERS,
                         onClick = { viewModel.selectTab(CompanionTab.ENCOUNTERS) },
@@ -130,40 +155,56 @@ fun CompanionScreen(viewModel: CompanionViewModel, modifier: Modifier = Modifier
             Spacer(Modifier.height(8.dp))
             Row(Modifier.fillMaxWidth().weight(1f), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                 Column((if (state.connected) Modifier.weight(0.72f) else Modifier.fillMaxWidth()).fillMaxHeight()) {
-                    when (state.selectedTab) {
-                        CompanionTab.ENCOUNTERS -> {
-                            Text("ENCUENTROS", color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 10.sp, fontWeight = FontWeight.Bold)
-                            Spacer(Modifier.height(5.dp))
-                            LazyColumn(verticalArrangement = Arrangement.spacedBy(5.dp)) {
-                                EncounterCategory.values().forEach { category ->
-                                    val encounters = state.categorizedEncounters[category].orEmpty()
-                                    if (encounters.isNotEmpty()) {
-                                        item { CategoryHeader(category) }
-                                        items(encounters) { EncounterRow(it) { viewModel.showPokemonDetails(Encounter(it.name, it.type, it.rate, it.level, it.spriteId)) } }
+                    if (state.connected) {
+                        when (state.selectedTab) {
+                            CompanionTab.TEAM -> {
+                                Text("EQUIPO", color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 10.sp, fontWeight = FontWeight.Bold)
+                                Spacer(Modifier.height(5.dp))
+                                TeamGrid(state.team, onSelect = { selectedTeamMon.value = it })
+                            }
+                            CompanionTab.ENCOUNTERS -> {
+                                Text("ENCUENTROS", color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 10.sp, fontWeight = FontWeight.Bold)
+                                Spacer(Modifier.height(5.dp))
+                                LazyColumn(verticalArrangement = Arrangement.spacedBy(5.dp)) {
+                                    EncounterCategory.values().forEach { category ->
+                                        val encounters = state.categorizedEncounters[category].orEmpty()
+                                        if (encounters.isNotEmpty()) {
+                                            item { CategoryHeader(category) }
+                                            items(encounters) { EncounterRow(it) { viewModel.showPokemonDetails(Encounter(it.name, it.type, it.rate, it.level, it.spriteId)) } }
+                                        }
                                     }
+                                    if (state.trades.isNotEmpty()) {
+                                        item { Text("INTERCAMBIOS", color = MaterialTheme.colorScheme.primary, fontSize = 10.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(top = 8.dp)) }
+                                        items(state.trades) { TradeRow(it) }
+                                    }
+                                    if (state.categorizedEncounters.values.all { it.isEmpty() }) item { EmptyTab("Sin encuentros catalogados") }
                                 }
-                                if (state.trades.isNotEmpty()) {
-                                    item { Text("INTERCAMBIOS", color = MaterialTheme.colorScheme.primary, fontSize = 10.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(top = 8.dp)) }
-                                    items(state.trades) { TradeRow(it) }
+                            }
+                            CompanionTab.ITEMS -> {
+                                Text("OBJETOS", color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 10.sp, fontWeight = FontWeight.Bold)
+                                Spacer(Modifier.height(5.dp))
+                                LazyColumn(verticalArrangement = Arrangement.spacedBy(5.dp)) {
+                                    if (state.items.isEmpty()) item { EmptyTab("No hay objetos catalogados") }
+                                    else items(state.items) { ItemRow(it) { viewModel.showItemDetails(it) } }
                                 }
-                                if (state.categorizedEncounters.values.all { it.isEmpty() }) item { EmptyTab("Sin encuentros catalogados") }
+                            }
+                            CompanionTab.TRAINERS -> {
+                                Text("ENTRENADORES", color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 10.sp, fontWeight = FontWeight.Bold)
+                                Spacer(Modifier.height(5.dp))
+                                LazyColumn(verticalArrangement = Arrangement.spacedBy(5.dp)) {
+                                    if (state.trainers.isEmpty()) item { EmptyTab("No hay entrenadores catalogados") }
+                                    else items(state.trainers.sortedByDescending { it.isSpecial }) { TrainerRow(it) { viewModel.showTrainerDetails(it) } }
+                                }
                             }
                         }
-                        CompanionTab.ITEMS -> {
-                            Text("OBJETOS", color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 10.sp, fontWeight = FontWeight.Bold)
-                            Spacer(Modifier.height(5.dp))
-                            LazyColumn(verticalArrangement = Arrangement.spacedBy(5.dp)) {
-                                if (state.items.isEmpty()) item { EmptyTab("No hay objetos catalogados") }
-                                else items(state.items) { ItemRow(it) { viewModel.showItemDetails(it) } }
-                            }
-                        }
-                        CompanionTab.TRAINERS -> {
-                            Text("ENTRENADORES", color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 10.sp, fontWeight = FontWeight.Bold)
-                            Spacer(Modifier.height(5.dp))
-                            LazyColumn(verticalArrangement = Arrangement.spacedBy(5.dp)) {
-                                if (state.trainers.isEmpty()) item { EmptyTab("No hay entrenadores catalogados") }
-                                else items(state.trainers) { TrainerRow(it) { viewModel.showTrainerDetails(it) } }
-                            }
+                    } else {
+                        Box(Modifier.fillMaxSize().padding(12.dp), contentAlignment = Alignment.Center) {
+                            Text(
+                                "Conecta a RetroArch para ver la información de la partida",
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                fontSize = 13.sp,
+                                textAlign = TextAlign.Center
+                            )
                         }
                     }
                 }
@@ -186,12 +227,16 @@ fun CompanionScreen(viewModel: CompanionViewModel, modifier: Modifier = Modifier
 
         state.detail?.let { DetailDialog(it, viewModel::closeDetails) }
 
+        state.battle?.let { battle ->
+            if (battle.isTrainer) TrainerBattleOverlay(battle) else WildBattleOverlay(battle)
+        }
+
+        selectedTeamMon.value?.let { mon ->
+            PokemonDetailOverlay(mon, showStats = false, showMoves = false, evolution = teamEvolution.value, onDismiss = { selectedTeamMon.value = null })
+        }
+
         if (state.showLogs) {
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(Color(0xAA000000))
-            ) {
+            Box(modifier = overlayScrim(Color(0xFF000000))) {
                 Column(
                     modifier = Modifier
                         .fillMaxSize()
@@ -250,7 +295,7 @@ private fun EncounterRow(encounter: Encounter, onClick: () -> Unit = {}) {
         }
         Spacer(Modifier.width(8.dp))
         Column(Modifier.weight(1f)) {
-            Text(encounter.name, fontSize = 14.sp, fontWeight = FontWeight.SemiBold)
+            Text(encounter.name, color = MaterialTheme.colorScheme.onSurface, fontSize = 14.sp, fontWeight = FontWeight.SemiBold)
             Text("${encounter.type}  ·  ${encounter.level}", fontSize = 10.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
         }
         Text("${encounter.rate}%", color = MaterialTheme.colorScheme.primary, fontSize = 16.sp, fontWeight = FontWeight.Bold)
@@ -281,7 +326,7 @@ private fun ItemRow(item: MapItem, onClick: () -> Unit = {}) {
         AsyncImage(model = ItemSprite.urlFor(item), contentDescription = item.name, modifier = Modifier.width(32.dp).height(32.dp))
         Spacer(Modifier.width(8.dp))
         Column(Modifier.weight(1f)) {
-        Text(item.name, fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
+        Text(item.name, color = MaterialTheme.colorScheme.onSurface, fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
         }
         Text("x${item.quantity}", color = MaterialTheme.colorScheme.primary, fontSize = 13.sp, fontWeight = FontWeight.Bold)
     }
@@ -325,7 +370,7 @@ private fun EncounterRow(encounter: CategorizedEncounter, onClick: () -> Unit = 
         }
         Spacer(Modifier.width(8.dp))
         Column(Modifier.weight(1f)) {
-            Text(encounter.name, fontSize = 14.sp, fontWeight = FontWeight.SemiBold)
+            Text(encounter.name, color = MaterialTheme.colorScheme.onSurface, fontSize = 14.sp, fontWeight = FontWeight.SemiBold)
             Text("${encounter.type}  ·  ${encounter.level}", fontSize = 10.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
         }
         Text("${encounter.rate}%", color = MaterialTheme.colorScheme.primary, fontSize = 16.sp, fontWeight = FontWeight.Bold)
@@ -348,63 +393,143 @@ private fun CategoryHeader(category: EncounterCategory) {
 }
 
 @Composable
-private fun DetailDialog(detail: DetailState, onDismiss: () -> Unit) {
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        confirmButton = { TextButton(onClick = onDismiss) { Text("Cerrar") } },
-        title = {
-            Text(when (detail) {
-                is DetailState.Pokemon -> detail.value.name
-                is DetailState.Item -> detail.value.name
-                is DetailState.Trainer -> detail.value.name
-            })
-        },
-        text = {
-            when (detail) {
-                is DetailState.Pokemon -> PokemonDetailContent(detail.value)
-                is DetailState.Item -> ItemDetailContent(detail.value)
-                is DetailState.Trainer -> TrainerDetailContent(detail.value)
-            }
-        }
+private fun overlayScrim(color: Color): Modifier = Modifier
+    .fillMaxSize()
+    .background(color)
+    .clickable(
+        interactionSource = remember { MutableInteractionSource() },
+        indication = null,
+        onClick = {}
     )
-}
 
 @Composable
-private fun PokemonDetailContent(details: com.thorcompanion.PokemonDetails) {
-    val shiny = remember { mutableStateOf(false) }
-    Column(verticalArrangement = Arrangement.spacedBy(5.dp)) {
-        AsyncImage(
-            model = if (shiny.value) details.shinySpriteUrl ?: details.normalSpriteUrl else details.normalSpriteUrl,
-            contentDescription = details.name,
-            modifier = Modifier.width(120.dp).height(120.dp).clickable { shiny.value = !shiny.value }
-        )
-        Text("Tipos: ${details.types.joinToString()}")
-        Text("Habilidades: ${details.abilities.joinToString()}")
-        Text("Evoluciones: ${details.evolutions.joinToString(" -> ")}")
-        if (details.description.isNotBlank()) Text(details.description, color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 12.sp)
-    }
-}
-
-@Composable
-private fun ItemDetailContent(details: com.thorcompanion.ItemDetails) {
-    Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
-        AsyncImage(model = details.spriteUrl, contentDescription = details.name, modifier = Modifier.width(96.dp).height(96.dp))
-        if (details.description.isNotBlank()) Text(details.description)
-        if (details.effect.isNotBlank()) Text(details.effect, color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 12.sp)
-    }
-}
-
-@Composable
-private fun TrainerDetailContent(trainer: Trainer) {
-    Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-    AsyncImage(model = TrainerSprite.urlFor(trainer), contentDescription = trainer.name, modifier = Modifier.width(120.dp).height(120.dp))
-        trainer.pokemon.forEach { pokemon ->
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                AsyncImage(model = PokemonSprite.urlForName(pokemon.name), contentDescription = pokemon.name, modifier = Modifier.width(32.dp).height(32.dp))
-                Text("${pokemon.name} · Nv. ${pokemon.level}", fontSize = 12.sp)
+private fun DetailPanel(
+    title: String,
+    spriteUrl: String?,
+    onDismiss: () -> Unit,
+    subtitle: (@Composable () -> Unit)? = null,
+    onSpriteClick: (() -> Unit)? = null,
+    info: @Composable () -> Unit
+) {
+    Box(overlayScrim(Color(0xFF101418))) {
+        Column(Modifier.fillMaxSize().padding(16.dp)) {
+            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
+                Text(title, color = MaterialTheme.colorScheme.primary, fontSize = 18.sp, fontWeight = FontWeight.Bold)
+                Button(onClick = onDismiss) { Text("Cerrar") }
+            }
+            Spacer(Modifier.height(8.dp))
+            Divider(color = MaterialTheme.colorScheme.surfaceVariant)
+            Spacer(Modifier.height(12.dp))
+            Row(Modifier.fillMaxWidth().weight(1f)) {
+                Column(Modifier.width(120.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+                    val spriteModifier = if (onSpriteClick != null) Modifier.size(96.dp).clickable(onClick = onSpriteClick) else Modifier.size(96.dp)
+                    AsyncImage(model = spriteUrl, contentDescription = title, modifier = spriteModifier)
+                    Spacer(Modifier.height(6.dp))
+                    subtitle?.invoke()
+                }
+                Spacer(Modifier.width(12.dp))
+                Column(Modifier.weight(1f).verticalScroll(rememberScrollState())) {
+                    info()
+                }
             }
         }
-        if (trainer.pokemon.isEmpty()) Text("Equipo no disponible para este combate.", color = MaterialTheme.colorScheme.onSurfaceVariant)
+    }
+}
+
+@Composable
+private fun DetailDialog(detail: DetailState, onDismiss: () -> Unit) {
+    when (detail) {
+        is DetailState.Pokemon -> PokemonDetailsPanel(detail.value, onDismiss)
+        is DetailState.Item -> ItemDetailsPanel(detail.value, onDismiss)
+        is DetailState.Trainer -> TrainerDetailsPanel(detail.value, onDismiss)
+    }
+}
+
+@Composable
+private fun PokemonDetailsPanel(details: com.thorcompanion.PokemonDetails, onDismiss: () -> Unit) {
+    val shiny = remember { mutableStateOf(false) }
+    val context = LocalContext.current
+    DetailPanel(
+        title = details.name,
+        spriteUrl = if (shiny.value) details.shinySpriteUrl ?: details.normalSpriteUrl else details.normalSpriteUrl,
+        onDismiss = onDismiss,
+        onSpriteClick = { shiny.value = !shiny.value }
+    ) {
+        if (details.types.isNotEmpty()) {
+            InfoSection("TIPOS") {
+                Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                    details.types.forEach { TypeBadge(it) }
+                }
+            }
+        }
+        if (details.abilities.isNotEmpty()) {
+            InfoSection("HABILIDADES") {
+                details.abilities.forEach { ability ->
+                    Column(
+                        Modifier
+                            .fillMaxWidth()
+                            .background(MaterialTheme.colorScheme.surface, RoundedCornerShape(8.dp))
+                            .padding(9.dp)
+                    ) {
+                        Text(ability, fontSize = 13.sp, color = MaterialTheme.colorScheme.onSurface, fontWeight = FontWeight.SemiBold)
+                        SpeciesCatalog.abilityDescriptionFor(context, ability)?.let { description ->
+                            Spacer(Modifier.height(2.dp))
+                            Text(description, fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        }
+                    }
+                    Spacer(Modifier.height(6.dp))
+                }
+            }
+        }
+        if (details.evolution != null && details.evolution.branches.isNotEmpty()) {
+            InfoSection("EVOLUCIONES") {
+                EvolutionNodeView(details.evolution)
+            }
+        }
+        if (details.description.isNotBlank()) {
+            InfoSection("DESCRIPCIÓN") {
+                Text(details.description, fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            }
+        }
+        Spacer(Modifier.height(4.dp))
+        Text("Toca el sprite para alternar shiny", color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 10.sp)
+    }
+}
+
+@Composable
+private fun ItemDetailsPanel(details: com.thorcompanion.ItemDetails, onDismiss: () -> Unit) {
+    DetailPanel(title = details.name, spriteUrl = details.spriteUrl, onDismiss = onDismiss) {
+        if (details.description.isNotBlank()) {
+            InfoSection("DESCRIPCIÓN") {
+                Text(details.description, fontSize = 13.sp, color = MaterialTheme.colorScheme.onSurface)
+            }
+        }
+        if (details.effect.isNotBlank()) {
+            InfoSection("EFECTO") {
+                Text(details.effect, fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            }
+        }
+    }
+}
+
+@Composable
+private fun TrainerDetailsPanel(trainer: Trainer, onDismiss: () -> Unit) {
+    DetailPanel(title = trainer.name, spriteUrl = TrainerSprite.urlFor(trainer), onDismiss = onDismiss) {
+        if (trainer.pokemon.isEmpty()) {
+            Text("Equipo no disponible para este combate.", color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 12.sp)
+        } else {
+            InfoSection("EQUIPO") {
+                trainer.pokemon.forEach { pokemon ->
+                    Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(vertical = 3.dp)) {
+                        AsyncImage(model = PokemonSprite.urlForName(pokemon.name), contentDescription = pokemon.name, modifier = Modifier.size(32.dp))
+                        Spacer(Modifier.width(8.dp))
+                        Text(pokemon.name, fontSize = 13.sp, color = MaterialTheme.colorScheme.onSurface, fontWeight = FontWeight.SemiBold)
+                        Spacer(Modifier.weight(1f))
+                        Text("Nv. ${pokemon.level}", fontSize = 13.sp, color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.SemiBold)
+                    }
+                }
+            }
+        }
     }
 }
 
@@ -414,4 +539,374 @@ private fun TradeRow(trade: TradeOffer) {
         Text("Recibes: ${trade.gives}", fontSize = 12.sp, fontWeight = FontWeight.SemiBold)
         Text("Entregas: ${trade.requests}", fontSize = 11.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
     }
+}
+
+@Composable
+private fun WildBattleOverlay(battle: BattleInfo) {
+    Box(overlayScrim(Color(0xFF101418))) {
+        Column(Modifier.fillMaxSize().padding(16.dp)) {
+            Spacer(Modifier.height(8.dp))
+            Text("COMBATE SALVAJE", color = MaterialTheme.colorScheme.primary, fontSize = 17.sp, fontWeight = FontWeight.Bold)
+            Spacer(Modifier.height(10.dp))
+            Row(Modifier.fillMaxWidth().weight(1f)) {
+                Column(Modifier.width(120.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+                    AsyncImage(
+                        model = PokemonSprite.urlForId(battle.opponent.speciesId),
+                        contentDescription = battle.opponent.name,
+                        modifier = Modifier.size(96.dp)
+                    )
+                    Spacer(Modifier.height(6.dp))
+                    Text(battle.opponent.name, color = MaterialTheme.colorScheme.onSurface, fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
+                    Spacer(Modifier.height(2.dp))
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Text("Nv. ${battle.opponent.level}", color = MaterialTheme.colorScheme.primary, fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
+                        Spacer(Modifier.width(4.dp))
+                        GenderIcon(battle.opponent.gender)
+                    }
+                }
+                Spacer(Modifier.width(12.dp))
+                Column(Modifier.weight(1f).verticalScroll(rememberScrollState())) {
+                    PokemonInfoContent(battle.opponent, showEvs = false, showStats = false, showMoves = false, showBattle = true)
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun TrainerBattleOverlay(battle: BattleInfo) {
+    val selected = remember { mutableStateOf<PokemonInfo?>(null) }
+    val activeIndex = battle.team.indexOfFirst { it.personality == battle.opponent.personality }
+    Box(overlayScrim(Color(0xFF101418))) {
+        Column(Modifier.fillMaxSize().padding(16.dp)) {
+            Spacer(Modifier.height(4.dp))
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                battle.trainerSprite?.let { sprite ->
+                    AsyncImage(model = sprite, contentDescription = battle.trainerName, modifier = Modifier.size(36.dp))
+                    Spacer(Modifier.width(8.dp))
+                }
+                Text(
+                    battle.trainerName ?: "COMBATE DE ENTRENADOR",
+                    color = MaterialTheme.colorScheme.primary,
+                    fontSize = 17.sp,
+                    fontWeight = FontWeight.Bold
+                )
+            }
+            Spacer(Modifier.height(8.dp))
+            TeamGrid(battle.team, onSelect = { selected.value = it }, large = true, activeIndex = activeIndex)
+        }
+    }
+    selected.value?.let { mon ->
+        PokemonDetailOverlay(mon, showStats = true, showMoves = true, onDismiss = { selected.value = null })
+    }
+}
+
+@Composable
+private fun PokemonDetailOverlay(info: PokemonInfo, showStats: Boolean, showMoves: Boolean, evolution: EvolutionNode? = null, onDismiss: () -> Unit) {
+    DetailPanel(
+        title = info.name,
+        spriteUrl = PokemonSprite.urlForId(info.speciesId),
+        onDismiss = onDismiss,
+        subtitle = {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text("Nv. ${info.level}", color = MaterialTheme.colorScheme.onSurface, fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
+                Spacer(Modifier.width(4.dp))
+                GenderIcon(info.gender)
+            }
+        }
+    ) {
+        PokemonInfoContent(info, showEvs = true, showStats = showStats, showMoves = showMoves, showBattle = false, evolution = evolution)
+    }
+}
+
+@Composable
+private fun InfoSection(title: String, content: @Composable () -> Unit) {
+    Column(Modifier.fillMaxWidth().padding(bottom = 10.dp)) {
+        Text(
+            title,
+            fontSize = 10.sp,
+            fontWeight = FontWeight.Bold,
+            color = MaterialTheme.colorScheme.primary,
+            letterSpacing = 0.8.sp
+        )
+        Spacer(Modifier.height(4.dp))
+        content()
+    }
+}
+
+@Composable
+private fun TypeBadge(type: String) {
+    Box(
+        Modifier
+            .background(typeColor(type), RoundedCornerShape(50))
+            .padding(horizontal = 10.dp, vertical = 3.dp)
+    ) {
+        Text(type, fontSize = 11.sp, color = Color.White, fontWeight = FontWeight.Bold)
+    }
+}
+
+private fun typeColor(type: String): Color = when (type.lowercase()) {
+    "normal" -> Color(0xFFA8A878)
+    "fire" -> Color(0xFFF08030)
+    "water" -> Color(0xFF6890F0)
+    "electric" -> Color(0xFFF8D030)
+    "grass" -> Color(0xFF78C850)
+    "ice" -> Color(0xFF98D8D8)
+    "fighting" -> Color(0xFFC03028)
+    "poison" -> Color(0xFFA040A0)
+    "ground" -> Color(0xFFE0C068)
+    "flying" -> Color(0xFFA890F0)
+    "psychic" -> Color(0xFFF85888)
+    "bug" -> Color(0xFFA8B820)
+    "rock" -> Color(0xFFB8A038)
+    "ghost" -> Color(0xFF705898)
+    "dragon" -> Color(0xFF7038F8)
+    "dark" -> Color(0xFF705848)
+    "steel" -> Color(0xFFB8B8D0)
+    "fairy" -> Color(0xFFEE99AC)
+    else -> Color(0xFF67727A)
+}
+
+private data class StatEntry(val label: String, val value: String, val highlighted: Boolean = false)
+
+@Composable
+private fun StatGrid(entries: List<StatEntry>) {
+    Column(verticalArrangement = Arrangement.spacedBy(3.dp)) {
+        entries.chunked(3).forEach { row ->
+            Row(Modifier.fillMaxWidth()) {
+                row.forEach { entry ->
+                    Row(Modifier.weight(1f)) {
+                        Text(entry.label, fontSize = 11.sp, color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.width(44.dp))
+                        Text(
+                            entry.value,
+                            fontSize = 12.sp,
+                            color = if (entry.highlighted) Color(0xFFFFD54F) else MaterialTheme.colorScheme.onSurface,
+                            fontWeight = if (entry.highlighted) FontWeight.Bold else FontWeight.SemiBold
+                        )
+                    }
+                }
+                repeat(3 - row.size) { Spacer(Modifier.weight(1f)) }
+            }
+        }
+    }
+}
+
+@Composable
+private fun PokemonInfoContent(info: PokemonInfo, showEvs: Boolean, showStats: Boolean, showMoves: Boolean, showBattle: Boolean, evolution: EvolutionNode? = null) {
+    val context = LocalContext.current
+    InfoSection("NATURALEZA") {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Text(info.nature, fontSize = 14.sp, color = MaterialTheme.colorScheme.onSurface, fontWeight = FontWeight.SemiBold)
+            Spacer(Modifier.width(8.dp))
+            Text(info.natureModifier.ifBlank { "Neutra" }, fontSize = 12.sp, color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.SemiBold)
+        }
+    }
+    info.ability?.let { ability ->
+        InfoSection("HABILIDAD") {
+            Text(ability, fontSize = 14.sp, color = MaterialTheme.colorScheme.onSurface, fontWeight = FontWeight.SemiBold)
+            SpeciesCatalog.abilityDescriptionFor(context, ability)?.let { description ->
+                Spacer(Modifier.height(2.dp))
+                Text(description, fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            }
+        }
+    }
+    if (evolution != null && evolution.branches.isNotEmpty()) {
+        InfoSection("EVOLUCIONES") {
+            EvolutionNodeView(evolution)
+        }
+    }
+    info.heldItemName?.let { heldItem ->
+        InfoSection("OBJETO EQUIPADO") {
+            Text(heldItem, fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurface)
+        }
+    }
+    if (showBattle && info.catchRate > 0) {
+        InfoSection("COMBATE") {
+            Text("Ratio de captura: ${info.catchRate}", fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurface)
+        }
+    }
+    if (showStats) {
+        InfoSection("CARACTERÍSTICAS") {
+            StatGrid(
+                listOf(
+                    StatEntry("PS", info.maxHp?.let { "${info.hp ?: 0} / $it" } ?: "–"),
+                    StatEntry("Atq", info.attack?.toString() ?: "–"),
+                    StatEntry("Def", info.defense?.toString() ?: "–"),
+                    StatEntry("Vel", info.speed?.toString() ?: "–"),
+                    StatEntry("AtEsp", info.spAttack?.toString() ?: "–"),
+                    StatEntry("DefEsp", info.spDefense?.toString() ?: "–")
+                )
+            )
+        }
+    }
+    InfoSection("IVs") {
+        IvSpreadRow(info.ivs)
+    }
+    if (showEvs) {
+        info.evs?.let { evs ->
+            InfoSection("EVs") { IvSpreadRow(evs) }
+        }
+        info.friendship?.let { friendship ->
+            InfoSection("FELICIDAD") { Text("$friendship", fontSize = 13.sp, color = MaterialTheme.colorScheme.onSurface) }
+        }
+        InfoSection("PODER OCULTO") { Text(info.hiddenPowerType, fontSize = 13.sp, color = MaterialTheme.colorScheme.onSurface) }
+    }
+    if (showMoves && info.moves.isNotEmpty()) {
+        InfoSection("ATAQUES") {
+            info.moves.forEach { move ->
+                Text("• $move", fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurface)
+            }
+        }
+    }
+}
+
+@Composable
+private fun EvolutionNodeView(node: EvolutionNode, depth: Int = 0) {
+    val indent = (depth * 14).dp
+    Text(
+        node.species,
+        fontSize = 13.sp,
+        color = MaterialTheme.colorScheme.onSurface,
+        fontWeight = FontWeight.SemiBold,
+        modifier = Modifier.padding(start = indent)
+    )
+    node.branches.forEach { branch ->
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.padding(start = indent, top = 1.dp)
+        ) {
+            Text("↳", color = MaterialTheme.colorScheme.primary, fontSize = 12.sp)
+            Spacer(Modifier.width(5.dp))
+            Text(branch.condition.ifBlank { "Evoluciona" }, color = MaterialTheme.colorScheme.primary, fontSize = 12.sp)
+        }
+        EvolutionNodeView(branch.target, depth + 1)
+    }
+}
+
+@Composable
+private fun GenderIcon(gender: Gender) {
+    val color = when (gender) {
+        Gender.FEMALE -> Color(0xFFF48FB1)
+        Gender.MALE -> Color(0xFF64B5F6)
+        Gender.GENDERLESS -> null
+    }
+    val symbol = when (gender) {
+        Gender.FEMALE -> "♀"
+        Gender.MALE -> "♂"
+        Gender.GENDERLESS -> null
+    }
+    if (color != null && symbol != null) {
+        Box(Modifier.size(18.dp).background(color, CircleShape), contentAlignment = Alignment.Center) {
+            Text(symbol, fontSize = 12.sp, color = Color.White, fontWeight = FontWeight.Bold)
+        }
+    }
+}
+
+private fun statusCode(status: Int): String? = when {
+    (status and 0x07) != 0 -> "SLP"      // sleep (3-bit turn counter)
+    (status and 0x80) != 0 -> "TOX"      // badly poisoned
+    (status and 0x08) != 0 -> "PSN"      // poisoned
+    (status and 0x10) != 0 -> "BRN"      // burned
+    (status and 0x20) != 0 -> "FRZ"      // frozen
+    (status and 0x40) != 0 -> "PAR"      // paralyzed
+    else -> null
+}
+
+private fun statusColor(code: String): Color = when (code) {
+    "SLP" -> Color(0xFF5C6BC0)
+    "TOX" -> Color(0xFF7B1FA2)
+    "PSN" -> Color(0xFF8E24AA)
+    "BRN" -> Color(0xFFE53935)
+    "FRZ" -> Color(0xFF0288D1)
+    "PAR" -> Color(0xFFF9A825)
+    else -> Color(0xFF90A4AE)
+}
+
+@Composable
+private fun TeamGrid(team: List<PokemonInfo>, onSelect: (PokemonInfo) -> Unit, large: Boolean = false, activeIndex: Int = -1) {
+    val slots = (0 until 6).map { team.getOrNull(it) }
+    val gap = if (large) 8.dp else 6.dp
+    Column(verticalArrangement = Arrangement.spacedBy(gap), modifier = Modifier.fillMaxSize()) {
+        repeat(2) { row ->
+            Row(horizontalArrangement = Arrangement.spacedBy(gap), modifier = Modifier.weight(1f)) {
+                repeat(3) { col ->
+                    val index = row * 3 + col
+                    val mon = slots[index]
+                    TeamSlot(mon, onClick = { mon?.let(onSelect) }, large = large, isActive = index == activeIndex, modifier = Modifier.weight(1f))
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun TeamSlot(mon: PokemonInfo?, onClick: () -> Unit, modifier: Modifier = Modifier, large: Boolean = false, isActive: Boolean = false) {
+    Box(
+        modifier = modifier
+            .fillMaxHeight()
+            .background(MaterialTheme.colorScheme.surface, RoundedCornerShape(10.dp))
+            .then(if (isActive) Modifier.border(2.dp, Color(0xFFFFD54F), RoundedCornerShape(10.dp)) else Modifier)
+            .clickable(enabled = mon != null, onClick = onClick),
+        contentAlignment = Alignment.Center
+    ) {
+        if (mon != null) {
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                val spriteSize = if (large) 88.dp else 44.dp
+                Box(Modifier.size(spriteSize)) {
+                    AsyncImage(
+                        model = PokemonSprite.urlForId(mon.speciesId),
+                        contentDescription = mon.name,
+                        modifier = Modifier.fillMaxSize()
+                    )
+                    if (mon.heldItemName != null) {
+                        AsyncImage(
+                            model = "file:///android_asset/items/poke-ball.png",
+                            contentDescription = "Objeto equipado",
+                            modifier = Modifier.size(if (large) 24.dp else 14.dp).align(Alignment.BottomEnd)
+                        )
+                    }
+                }
+                Text(mon.name, fontSize = if (large) 14.sp else 10.sp, color = MaterialTheme.colorScheme.onSurface, maxLines = 1)
+                Text("Nv. ${mon.level}", fontSize = if (large) 13.sp else 10.sp, color = MaterialTheme.colorScheme.primary)
+                val status = statusCode(mon.status)
+                if (status != null || mon.maxHp != null) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        if (status != null) {
+                            Box(
+                                Modifier
+                                    .background(statusColor(status), RoundedCornerShape(3.dp))
+                                    .padding(horizontal = if (large) 4.dp else 3.dp, vertical = if (large) 1.dp else 0.dp)
+                            ) {
+                                Text(status, fontSize = if (large) 9.sp else 7.sp, color = Color.White, fontWeight = FontWeight.Bold)
+                            }
+                            Spacer(Modifier.width(3.dp))
+                        }
+                        mon.maxHp?.let { maxHp ->
+                            val current = mon.hp ?: 0
+                            val hpColor = when {
+                                current * 100 / maxOf(maxHp, 1) > 50 -> Color(0xFF65D58A)
+                                current * 100 / maxOf(maxHp, 1) > 20 -> Color(0xFFFFD54F)
+                                else -> Color(0xFFE57373)
+                            }
+                            Text("PS $current/$maxHp", fontSize = if (large) 12.sp else 9.sp, color = hpColor, fontWeight = FontWeight.SemiBold)
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun IvSpreadRow(ivs: PokemonDecoder.IvSpread) {
+    StatGrid(
+        listOf(
+            StatEntry("PS", ivs.hp.toString(), ivs.hp == 31),
+            StatEntry("Atq", ivs.attack.toString(), ivs.attack == 31),
+            StatEntry("Def", ivs.defense.toString(), ivs.defense == 31),
+            StatEntry("Vel", ivs.speed.toString(), ivs.speed == 31),
+            StatEntry("AtEsp", ivs.spAttack.toString(), ivs.spAttack == 31),
+            StatEntry("DefEsp", ivs.spDefense.toString(), ivs.spDefense == 31)
+        )
+    )
 }

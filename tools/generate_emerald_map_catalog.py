@@ -80,7 +80,11 @@ def parse_map(map_file, trainers, trades):
     map_data = json.loads(map_file.read_text(encoding="utf-8"))
     scripts_file = map_file.parent / "scripts.inc"
     script_text = scripts_file.read_text(encoding="utf-8") if scripts_file.exists() else ""
-    script_blocks = parse_script_blocks(script_text)
+    local_script_blocks = parse_script_blocks(script_text)
+    # Resolve script labels from both the map's own scripts and the global scripts,
+    # but only attribute trainers from this map's own scripts below. Global scripts
+    # (e.g. Gabby & Ty's roaming battles) must never be attributed to every map.
+    script_blocks = dict(local_script_blocks)
     global_scripts = SOURCE / "data/scripts"
     for global_file in global_scripts.glob("*.inc"):
         script_blocks.update(parse_script_blocks(global_file.read_text(encoding="utf-8")))
@@ -112,8 +116,24 @@ def parse_map(map_file, trainers, trades):
                 entry["x"] = event.get("x")
                 entry["y"] = event.get("y")
                 trainers_found[trainer_id] = entry
+    # Hidden items live in the map's background events, not in scripts.
+    for bg_event in map_data.get("bg_events", []):
+        if bg_event.get("type") == "hidden_item":
+            item = bg_event.get("item", "")
+            if item.startswith("ITEM_"):
+                item_key = item[len("ITEM_"):]
+                items.append({
+                    "name": display_name(item_key),
+                    "quantity": 1,
+                    "spriteKey": item_key.lower().replace("_", "-"),
+                    "kind": "hidden_item",
+                    "x": bg_event.get("x"),
+                    "y": bg_event.get("y"),
+                    "flag": bg_event.get("flag", "0")
+                })
     # Include scripted battles even when the NPC is hidden or trainer_type is NONE, such as the rival.
-    for script_name, block in script_blocks.items():
+    # Only scan this map's own scripts so roaming/global battles are not duplicated across maps.
+    for script_name, block in local_script_blocks.items():
         battle_ids = re.findall(r"\btrainerbattle_[A-Za-z0-9_]+\s+(TRAINER_[A-Z0-9_]+)", block)
         for trainer_id in battle_ids:
             if trainer_id in trainers and trainer_id not in trainers_found:

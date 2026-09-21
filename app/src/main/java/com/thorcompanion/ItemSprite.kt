@@ -6,6 +6,6 @@ object ItemSprite {
             .replace(". ", "-")
             .replace(" ", "-")
             .replace(".", "")
-        return "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/$slug.png"
+        return "file:///android_asset/items/$slug.png"
     }
 }

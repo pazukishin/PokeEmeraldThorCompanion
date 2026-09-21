@@ -16,5 +16,5 @@ object PokemonSprite {
 
     fun urlForName(name: String): String? = urlForId(localIds[name.lowercase()])
 
-    private fun urlForId(id: Int?): String? = id?.let { "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-iii/emerald/$it.png" }
+    fun urlForId(id: Int?): String? = id?.let { "file:///android_asset/pokemon/$it.png" }
 }

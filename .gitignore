@@ -1,0 +1,26 @@
+# Gradle
+.gradle/
+.gradle-home/
+build/
+app/build/
+.kotlin/
+
+# Local configuration
+local.properties
+
+# IDE
+.idea/
+*.iml
+.DS_Store
+
+# Android build outputs
+captures/
+.externalNativeBuild/
+.cxx/
+*.apk
+*.aab
+*.keystore
+!debug.keystore
+
+# Local release APKs (published via GitHub Releases instead)
+releases/
