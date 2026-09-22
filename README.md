@@ -1,3 +1,5 @@
+<img width="1097" height="955" alt="image" src="https://github.com/user-attachments/assets/05d30628-2474-4f41-af54-a70b9ce2882d" />
+
 # Thor Companion
 
 **Disclaimer**: This project was entirely developed with the assistance of AI.
