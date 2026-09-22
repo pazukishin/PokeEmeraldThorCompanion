@@ -112,3 +112,27 @@ in `tools/`:
 ## Known Issues
 
 None known.
+
+## Credits
+
+Third-party resources used or consulted while building this project:
+
+- **pret/pokeemerald** ([github.com/pret/pokeemerald](https://github.com/pret/pokeemerald)) — the
+  Pokémon Emerald decompilation. Source of all bundled game data (species, moves, items,
+  abilities, evolutions, Pokédex flavor text, trainers, maps and encounters), the in-memory
+  struct layouts (`struct Pokemon`, `struct BattlePokemon`) and the encryption/substruct-ordering logic.
+- **Ironmon Tracker** ([github.com/besteon/Ironmon-Tracker](https://github.com/besteon/Ironmon-Tracker)) —
+  verified EWRAM/IWRAM memory offsets (its `GameAddresses/Pokémon Emerald.json`), used to pin down
+  the live memory addresses.
+- **PokéAPI** ([pokeapi.co](https://pokeapi.co)) and **PokeAPI/sprites**
+  ([github.com/PokeAPI/sprites](https://github.com/PokeAPI/sprites)) — Pokémon and item sprite
+  artwork, and item descriptions (the only remaining online fallback).
+- **Bulbapedia** ([bulbapedia.bulbagarden.net](https://bulbapedia.bulbagarden.net)) — consulted for
+  game-mechanics reference, evolution methods, the nature list and the type-colour palette.
+- **RetroArch** ([retroarch.com](https://www.retroarch.com)) with the **V.GBA-Next** core — the
+  emulator/core whose Network Control Interface the app reads from.
+- Built with **Kotlin**, **Jetpack Compose (Material 3)**, **Coil**, **kotlinx-coroutines** and the
+  Android SDK.
+
+Pokémon names, sprites and game data remain the property of Nintendo / Game Freak / The Pokémon
+Company; this is a non-commercial fan tool.
