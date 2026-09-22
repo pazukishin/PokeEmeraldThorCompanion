@@ -694,7 +694,7 @@ private fun PokemonInfoContent(info: PokemonInfo, showEvs: Boolean, showStats: B
         Row(verticalAlignment = Alignment.CenterVertically) {
             Text(info.nature, fontSize = 14.sp, color = MaterialTheme.colorScheme.onSurface, fontWeight = FontWeight.SemiBold)
             Spacer(Modifier.width(8.dp))
-            Text(info.natureModifier.ifBlank { "Neutra" }, fontSize = 12.sp, color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.SemiBold)
+            Text(info.natureModifier.ifBlank { "Neutral" }, fontSize = 12.sp, color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.SemiBold)
         }
     }
     info.ability?.let { ability ->
@@ -707,7 +707,7 @@ private fun PokemonInfoContent(info: PokemonInfo, showEvs: Boolean, showStats: B
         }
     }
     if (evolution != null && evolution.branches.isNotEmpty()) {
-        InfoSection("EVOLUCIONES") {
+        InfoSection("EVOLUTIONS") {
             EvolutionNodeView(evolution)
         }
     }
