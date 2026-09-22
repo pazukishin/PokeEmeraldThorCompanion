@@ -43,7 +43,7 @@ class RetroArchClient {
                 return ptr + EmeraldAddresses.SAVEBLOCK1_LOCATION
             }
         }
-        onLog("No se pudo leer gSaveBlock1Ptr; usando dirección fija")
+        onLog("Could not read gSaveBlock1Ptr; using fixed address")
         return CoreProfiles.vGbaNextEmerald.mapAddress
     }
 

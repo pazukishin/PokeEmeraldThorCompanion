@@ -83,9 +83,9 @@
           "flag": "FLAG_ITEM_ABANDONED_SHIP_HIDDEN_FLOOR_ROOM_2_SCANNER"
         },
         {
-          "name": "Tm Rain Dance",
+          "name": "TM18",
           "quantity": 1,
-          "spriteKey": "tm-rain-dance",
+          "spriteKey": "tm-normal",
           "kind": "item_ball",
           "x": 5,
           "y": 11,
@@ -103,7 +103,7 @@
         {
           "name": "Room 1 Key",
           "quantity": 1,
-          "spriteKey": "room-1-key",
+          "spriteKey": "basement-key",
           "kind": "hidden_item",
           "x": 42,
           "y": 10,
@@ -112,7 +112,7 @@
         {
           "name": "Room 2 Key",
           "quantity": 1,
-          "spriteKey": "room-2-key",
+          "spriteKey": "basement-key",
           "kind": "hidden_item",
           "x": 20,
           "y": 5,
@@ -121,7 +121,7 @@
         {
           "name": "Room 4 Key",
           "quantity": 1,
-          "spriteKey": "room-4-key",
+          "spriteKey": "basement-key",
           "kind": "hidden_item",
           "x": 1,
           "y": 12,
@@ -130,7 +130,7 @@
         {
           "name": "Room 6 Key",
           "quantity": 1,
-          "spriteKey": "room-6-key",
+          "spriteKey": "basement-key",
           "kind": "hidden_item",
           "x": 1,
           "y": 2,
@@ -292,9 +292,9 @@
     "MAP_ABANDONED_SHIP_ROOM_B1F": {
       "items": [
         {
-          "name": "Tm Ice Beam",
+          "name": "TM13",
           "quantity": 1,
-          "spriteKey": "tm-ice-beam",
+          "spriteKey": "tm-normal",
           "kind": "item_ball",
           "x": 4,
           "y": 4,
@@ -692,9 +692,9 @@
     "MAP_DEWFORD_TOWN_HALL": {
       "items": [
         {
-          "name": "Tm Sludge Bomb",
+          "name": "TM36",
           "quantity": 1,
-          "spriteKey": "tm-sludge-bomb",
+          "spriteKey": "tm-normal",
           "kind": "npc_reward",
           "x": 8,
           "y": 6,
@@ -815,9 +815,9 @@
     "MAP_FIERY_PATH": {
       "items": [
         {
-          "name": "Tm Toxic",
+          "name": "TM06",
           "quantity": 1,
-          "spriteKey": "tm-toxic",
+          "spriteKey": "tm-normal",
           "kind": "item_ball",
           "x": 8,
           "y": 3,
@@ -979,9 +979,9 @@
     "MAP_FORTREE_CITY_HOUSE2": {
       "items": [
         {
-          "name": "Tm Hidden Power",
+          "name": "TM10",
           "quantity": 1,
-          "spriteKey": "tm-hidden-power",
+          "spriteKey": "tm-normal",
           "kind": "npc_reward",
           "x": 2,
           "y": 3,
@@ -994,9 +994,9 @@
     "MAP_GRANITE_CAVE_1F": {
       "items": [
         {
-          "name": "Hm Flash",
+          "name": "HM05",
           "quantity": 1,
-          "spriteKey": "hm-flash",
+          "spriteKey": "hm-normal",
           "kind": "npc_reward",
           "x": 36,
           "y": 9,
@@ -1075,9 +1075,9 @@
     "MAP_GRANITE_CAVE_STEVENS_ROOM": {
       "items": [
         {
-          "name": "Tm Steel Wing",
+          "name": "TM47",
           "quantity": 1,
-          "spriteKey": "tm-steel-wing",
+          "spriteKey": "tm-normal",
           "kind": "npc_reward",
           "x": 7,
           "y": 8,
@@ -1488,9 +1488,9 @@
     "MAP_LILYCOVE_CITY_HOUSE2": {
       "items": [
         {
-          "name": "Tm Rest",
+          "name": "TM44",
           "quantity": 1,
-          "spriteKey": "tm-rest",
+          "spriteKey": "tm-normal",
           "kind": "npc_reward",
           "x": 0,
           "y": 4,
@@ -2024,9 +2024,9 @@
     "MAP_MAUVILLE_CITY_HOUSE1": {
       "items": [
         {
-          "name": "Hm Rock Smash",
+          "name": "HM06",
           "quantity": 1,
-          "spriteKey": "hm-rock-smash",
+          "spriteKey": "hm-normal",
           "kind": "npc_reward",
           "x": 4,
           "y": 4,
@@ -2039,9 +2039,9 @@
     "MAP_METEOR_FALLS_1F_1R": {
       "items": [
         {
-          "name": "Tm Iron Tail",
+          "name": "TM23",
           "quantity": 1,
-          "spriteKey": "tm-iron-tail",
+          "spriteKey": "tm-normal",
           "kind": "item_ball",
           "x": 2,
           "y": 4,
@@ -2116,9 +2116,9 @@
     "MAP_METEOR_FALLS_B1F_2R": {
       "items": [
         {
-          "name": "Tm Dragon Claw",
+          "name": "TM02",
           "quantity": 1,
-          "spriteKey": "tm-dragon-claw",
+          "spriteKey": "tm-normal",
           "kind": "item_ball",
           "x": 5,
           "y": 3,
@@ -2964,9 +2964,9 @@
     "MAP_MT_PYRE_6F": {
       "items": [
         {
-          "name": "Tm Shadow Ball",
+          "name": "TM30",
           "quantity": 1,
-          "spriteKey": "tm-shadow-ball",
+          "spriteKey": "tm-normal",
           "kind": "item_ball",
           "x": 6,
           "y": 9,
@@ -3014,9 +3014,9 @@
           "flag": "FLAG_ITEM_MT_PYRE_EXTERIOR_MAX_POTION"
         },
         {
-          "name": "Tm Skill Swap",
+          "name": "TM48",
           "quantity": 1,
-          "spriteKey": "tm-skill-swap",
+          "spriteKey": "tm-normal",
           "kind": "item_ball",
           "x": 19,
           "y": 40,
@@ -3861,9 +3861,9 @@
           "flag": "FLAG_ITEM_ROUTE_104_POTION"
         },
         {
-          "name": "Tm Bullet Seed",
+          "name": "TM09",
           "quantity": 1,
-          "spriteKey": "tm-bullet-seed",
+          "spriteKey": "tm-normal",
           "kind": "npc_reward",
           "x": 5,
           "y": 26,
@@ -6071,9 +6071,9 @@
           "flag": "0"
         },
         {
-          "name": "Tm Sandstorm",
+          "name": "TM37",
           "quantity": 1,
-          "spriteKey": "tm-sandstorm",
+          "spriteKey": "tm-normal",
           "kind": "item_ball",
           "x": 33,
           "y": 104,
@@ -6691,9 +6691,9 @@
           "flag": "FLAG_HIDDEN_ITEM_ROUTE_113_ETHER"
         },
         {
-          "name": "Tm Double Team",
+          "name": "TM32",
           "quantity": 1,
-          "spriteKey": "tm-double-team",
+          "spriteKey": "tm-normal",
           "kind": "hidden_item",
           "x": 22,
           "y": 5,
@@ -6913,9 +6913,9 @@
           "flag": "FLAG_ITEM_ROUTE_114_PROTEIN"
         },
         {
-          "name": "Tm Roar",
+          "name": "TM05",
           "quantity": 1,
-          "spriteKey": "tm-roar",
+          "spriteKey": "tm-normal",
           "kind": "npc_reward",
           "x": 19,
           "y": 11,
@@ -7163,9 +7163,9 @@
     "MAP_ROUTE114_FOSSIL_MANIACS_HOUSE": {
       "items": [
         {
-          "name": "Tm Dig",
+          "name": "TM28",
           "quantity": 1,
-          "spriteKey": "tm-dig",
+          "spriteKey": "tm-normal",
           "kind": "npc_reward",
           "x": 3,
           "y": 2,
@@ -7187,9 +7187,9 @@
           "flag": "FLAG_ITEM_ROUTE_115_SUPER_POTION"
         },
         {
-          "name": "Tm Focus Punch",
+          "name": "TM01",
           "quantity": 1,
-          "spriteKey": "tm-focus-punch",
+          "spriteKey": "tm-normal",
           "kind": "item_ball",
           "x": 18,
           "y": 7,
@@ -7459,7 +7459,7 @@
         {
           "name": "X Special",
           "quantity": 1,
-          "spriteKey": "x-special",
+          "spriteKey": "x-sp-atk",
           "kind": "item_ball",
           "x": 55,
           "y": 12,
@@ -9369,9 +9369,9 @@
           "flag": "FLAG_ITEM_ROUTE_123_CALCIUM"
         },
         {
-          "name": "Tm Giga Drain",
+          "name": "TM19",
           "quantity": 1,
-          "spriteKey": "tm-giga-drain",
+          "spriteKey": "tm-normal",
           "kind": "npc_reward",
           "x": 108,
           "y": 13,
@@ -11281,9 +11281,9 @@
     "MAP_RUSTBORO_CITY": {
       "items": [
         {
-          "name": "X Defend",
+          "name": "X Defense",
           "quantity": 1,
-          "spriteKey": "x-defend",
+          "spriteKey": "x-defense",
           "kind": "item_ball",
           "x": 36,
           "y": 51,
@@ -11399,9 +11399,9 @@
     "MAP_RUSTBORO_CITY_CUTTERS_HOUSE": {
       "items": [
         {
-          "name": "Hm Cut",
+          "name": "HM01",
           "quantity": 1,
-          "spriteKey": "hm-cut",
+          "spriteKey": "hm-normal",
           "kind": "npc_reward",
           "x": 7,
           "y": 5,
@@ -11638,9 +11638,9 @@
     "MAP_SAFARI_ZONE_NORTHWEST": {
       "items": [
         {
-          "name": "Tm Solar Beam",
+          "name": "TM22",
           "quantity": 1,
-          "spriteKey": "tm-solar-beam",
+          "spriteKey": "tm-normal",
           "kind": "item_ball",
           "x": 33,
           "y": 7,
@@ -11701,9 +11701,9 @@
     "MAP_SCORCHED_SLAB": {
       "items": [
         {
-          "name": "Tm Sunny Day",
+          "name": "TM11",
           "quantity": 1,
-          "spriteKey": "tm-sunny-day",
+          "spriteKey": "tm-normal",
           "kind": "item_ball",
           "x": 7,
           "y": 5,
@@ -11832,9 +11832,9 @@
     "MAP_SEAFLOOR_CAVERN_ROOM9": {
       "items": [
         {
-          "name": "Tm Earthquake",
+          "name": "TM26",
           "quantity": 1,
-          "spriteKey": "tm-earthquake",
+          "spriteKey": "tm-normal",
           "kind": "item_ball",
           "x": 14,
           "y": 5,
@@ -11893,9 +11893,9 @@
     "MAP_SHOAL_CAVE_LOW_TIDE_ICE_ROOM": {
       "items": [
         {
-          "name": "Tm Hail",
+          "name": "TM07",
           "quantity": 1,
-          "spriteKey": "tm-hail",
+          "spriteKey": "tm-normal",
           "kind": "item_ball",
           "x": 12,
           "y": 8,
@@ -11977,9 +11977,9 @@
     "MAP_SLATEPORT_CITY_BATTLE_TENT_LOBBY": {
       "items": [
         {
-          "name": "Tm Torment",
+          "name": "TM41",
           "quantity": 1,
-          "spriteKey": "tm-torment",
+          "spriteKey": "tm-normal",
           "kind": "npc_reward",
           "x": 1,
           "y": 5,
@@ -11992,9 +11992,9 @@
     "MAP_SLATEPORT_CITY_OCEANIC_MUSEUM_1F": {
       "items": [
         {
-          "name": "Tm Thief",
+          "name": "TM46",
           "quantity": 1,
-          "spriteKey": "tm-thief",
+          "spriteKey": "tm-normal",
           "kind": "npc_reward",
           "x": 9,
           "y": 4,
@@ -12220,9 +12220,9 @@
     "MAP_SOOTOPOLIS_CITY_HOUSE1": {
       "items": [
         {
-          "name": "Tm Brick Break",
+          "name": "TM31",
           "quantity": 1,
-          "spriteKey": "tm-brick-break",
+          "spriteKey": "tm-normal",
           "kind": "npc_reward",
           "x": 2,
           "y": 4,
@@ -12293,9 +12293,9 @@
     "MAP_SS_TIDAL_ROOMS": {
       "items": [
         {
-          "name": "Tm Snatch",
+          "name": "TM49",
           "quantity": 1,
-          "spriteKey": "tm-snatch",
+          "spriteKey": "tm-normal",
           "kind": "npc_reward",
           "x": 28,
           "y": 5,
@@ -12615,9 +12615,9 @@
     "MAP_VERDANTURF_TOWN_BATTLE_TENT_LOBBY": {
       "items": [
         {
-          "name": "Tm Attract",
+          "name": "TM45",
           "quantity": 1,
-          "spriteKey": "tm-attract",
+          "spriteKey": "tm-normal",
           "kind": "npc_reward",
           "x": 0,
           "y": 5,
@@ -12755,9 +12755,9 @@
     "MAP_VICTORY_ROAD_B1F": {
       "items": [
         {
-          "name": "Tm Psychic",
+          "name": "TM29",
           "quantity": 1,
-          "spriteKey": "tm-psychic",
+          "spriteKey": "tm-normal",
           "kind": "item_ball",
           "x": 42,
           "y": 8,

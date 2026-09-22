@@ -11,8 +11,10 @@ Companion Android application for playing Pokemon Emerald on RetroArch from an A
 - Reads the game memory with `READ_CORE_MEMORY`.
 - Current map and encounter list (species, levels, method and capture rate).
 - Offline-first data: encounters, trainers, items (including hidden items), species names,
-  Pokémon/item sprites, types, abilities and ability descriptions are bundled locally; PokéAPI
-  is only a fallback for flavor text and evolution chains.
+  Pokémon/item sprites, types, abilities, ability descriptions, Pokédex flavor text and
+  evolution chains are all bundled locally. Item detail descriptions are the only remaining
+  online fallback.
+- Entire UI in English (tabs, labels, natures, stat names, statuses and evolution methods).
 - Automatic detection of wild battles, trainer battles and the party summary screen.
 
 ### Live party / battle info
@@ -80,12 +82,18 @@ in `tools/`:
 - `generate_species_details.py` — generates `species_to_national.json`, `species_details.json` (types, abilities, gender ratio and catch rate) and `abilities.json`.
 - `generate_ability_descriptions.py` — generates `ability_descriptions.json` (ability name → in-game description).
 - `generate_item_move_data.py` — generates `items.json` (item names) and `moves.json` (move names).
+- `generate_evolutions.py` — generates `emerald_evolutions.json` (species → evolution branches with method).
+- `generate_flavor_text.py` — generates `emerald_flavor_text.json` (species → Pokédex flavor text).
 - `generate_trainers.py` — generates `trainers.json` (trainer id → name and sprite).
 - `download_sprites.py` — downloads the 386 Pokémon sprites and the item sprites into `assets/pokemon/` and `assets/items/`.
 - `generate_icon.py` — generates the launcher icon (Poké Ball on an emerald gradient) as PNG mipmaps.
 
 ## Changelog
 
+- **1.2.8** — Whole UI translated to English; Pokédex flavor text and evolution chains are now
+  offline (generated from pokeemerald); fixed item sprites for TMs/HMs, X items and keys.
+- **1.2.7** — New launcher icon (Poké Ball on an emerald gradient); release builds without the
+  "debug" suffix.
 - **1.2.6** — Status condition badges (`SLP`/`PSN`/`TOX`/`BRN`/`FRZ`/`PAR`) next to HP in the
   team grid; the Poké Ball held-item indicator is now overlapped on the sprite's corner.
 - **1.2.5** — Fixed held-item name lookup (an off-by-one in `items.json`); added the Poké Ball
@@ -100,12 +108,4 @@ in `tools/`:
 
 ## Known Issues
 
-- **Some item sprites are missing (TMs/HMs, keys, X Defend/X Special)**: pokeemerald names TMs by
-  move (`ITEM_TM_ATTRACT`) while PokeAPI numbers them (`tm01`), so those sprites don't resolve
-  and show a blank box. Will be fixed in a later version.
-
-## Next Recommended Iteration
-
-- Persist host and port settings and add a configuration screen to select the ROM profile.
-- Flavor-text descriptions and evolution data still come from PokéAPI when online
-  (types, abilities and ability descriptions are offline).
+None known.

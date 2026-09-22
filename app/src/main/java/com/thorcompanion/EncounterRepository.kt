@@ -14,46 +14,81 @@ class EncounterRepository(private val context: Context) {
     private var mapContentCatalog: JSONObject? = null
     private var speciesDetailsCatalog: JSONObject? = null
     private var abilityNamesCatalog: JSONObject? = null
+    private var evolutionCatalog: Map<Int, List<OfflineEvo>>? = null
+    private var flavorCatalog: Map<Int, String>? = null
+
+    private data class OfflineEvo(val condition: String, val target: Int)
 
     fun forMap(mapId: String): List<Encounter> = EncounterCatalog.forMap(mapId)
 
     suspend fun loadPokemonDetails(encounter: Encounter): PokemonDetails? = withContext(Dispatchers.IO) {
-        val nationalDex = encounter.spriteId ?: SpeciesCatalog.spriteIdForName(context, encounter.name)
-        val local = nationalDex?.let { localSpeciesDetails(it) }
-        val online = runCatching { fetchPokemonDetailsOnline(encounter) }.getOrNull()
-        if (online == null && local == null) return@withContext null
+        val nationalDex = encounter.spriteId ?: SpeciesCatalog.spriteIdForName(context, encounter.name) ?: return@withContext null
+        val local = localSpeciesDetails(nationalDex)
         PokemonDetails(
             name = encounter.name,
-            types = online?.types ?: local?.types.orEmpty(),
-            abilities = local?.abilities.orEmpty().ifEmpty { online?.abilities.orEmpty() },
-            evolution = online?.evolution,
-            description = online?.description ?: "",
-            normalSpriteUrl = online?.normalSpriteUrl ?: nationalDex?.let { PokemonSprite.urlForId(it) },
-            shinySpriteUrl = online?.shinySpriteUrl
+            types = local?.types.orEmpty(),
+            abilities = local?.abilities.orEmpty(),
+            evolution = buildOfflineEvolution(nationalDex),
+            description = offlineFlavorText()[nationalDex] ?: "",
+            normalSpriteUrl = PokemonSprite.urlForId(nationalDex),
+            shinySpriteUrl = null
         )
     }
 
     suspend fun loadEvolutionForSpecies(speciesId: Int): EvolutionNode? = withContext(Dispatchers.IO) {
-        runCatching {
-            val species = getJson("https://pokeapi.co/api/v2/pokemon-species/$speciesId/")
-            val chain = getJson(species.getJSONObject("evolution_chain").getString("url"))
-            buildEvolutionTree(chain.getJSONObject("chain"))
-        }.getOrNull()
+        buildOfflineEvolution(speciesId)
     }
 
-    private suspend fun fetchPokemonDetailsOnline(encounter: Encounter): PokemonDetails {
-        val slug = encounter.name.lowercase().replace(' ', '-')
-        val root = getJson("https://pokeapi.co/api/v2/pokemon/$slug/")
-        val species = getJson(root.getJSONObject("species").getString("url"))
-        val types = root.getJSONArray("types").let { array -> (0 until array.length()).map { array.getJSONObject(it).getJSONObject("type").getString("name").replace('-', ' ').replaceFirstChar { c -> c.uppercase() } } }
-        val abilities = root.getJSONArray("abilities").let { array -> (0 until array.length()).map { array.getJSONObject(it).getJSONObject("ability").getString("name").replace('-', ' ').replaceFirstChar { c -> c.uppercase() } } }
-        val description = species.getJSONArray("flavor_text_entries").let { array ->
-            (0 until array.length()).firstOrNull { array.getJSONObject(it).getJSONObject("language").getString("name") == "en" }
-                ?.let { array.getJSONObject(it).getString("flavor_text").replace('\n', ' ').replace('\u000c', ' ') } ?: ""
+    private fun buildOfflineEvolution(nationalDex: Int): EvolutionNode? {
+        val map = offlineEvolutions()
+        if (map[nationalDex].isNullOrEmpty()) return null
+        return buildEvoNode(map, nationalDex, HashSet())
+    }
+
+    private fun buildEvoNode(map: Map<Int, List<OfflineEvo>>, dex: Int, visited: MutableSet<Int>): EvolutionNode {
+        val name = SpeciesCatalog.nameFor(context, dex) ?: "#$dex"
+        if (!visited.add(dex)) return EvolutionNode(name)
+        val branches = map[dex].orEmpty().mapNotNull { evo ->
+            EvolutionBranch(evo.condition, buildEvoNode(map, evo.target, visited))
         }
-        val chain = getJson(species.getJSONObject("evolution_chain").getString("url"))
-        val evolution = buildEvolutionTree(chain.getJSONObject("chain"))
-        return PokemonDetails(encounter.name, types, abilities, evolution, description, root.getJSONObject("sprites").optString("front_default").ifBlank { null }, root.getJSONObject("sprites").optString("front_shiny").ifBlank { null })
+        return EvolutionNode(name, branches)
+    }
+
+    private fun offlineEvolutions(): Map<Int, List<OfflineEvo>> {
+        evolutionCatalog?.let { return it }
+        val catalog = runCatching {
+            context.assets.open("emerald_evolutions.json").bufferedReader().use { JSONObject(it.readText()) }
+        }.getOrNull() ?: return emptyMap()
+        val map = mutableMapOf<Int, List<OfflineEvo>>()
+        val keys = catalog.keys()
+        while (keys.hasNext()) {
+            val key = keys.next()
+            val arr = catalog.optJSONArray(key) ?: continue
+            val list = buildList {
+                for (i in 0 until arr.length()) {
+                    val obj = arr.getJSONObject(i)
+                    add(OfflineEvo(obj.optString("condition"), obj.optInt("target")))
+                }
+            }
+            map[key.toInt()] = list
+        }
+        evolutionCatalog = map
+        return map
+    }
+
+    private fun offlineFlavorText(): Map<Int, String> {
+        flavorCatalog?.let { return it }
+        val catalog = runCatching {
+            context.assets.open("emerald_flavor_text.json").bufferedReader().use { JSONObject(it.readText()) }
+        }.getOrNull() ?: return emptyMap()
+        val map = mutableMapOf<Int, String>()
+        val keys = catalog.keys()
+        while (keys.hasNext()) {
+            val key = keys.next()
+            map[key.toInt()] = catalog.optString(key)
+        }
+        flavorCatalog = map
+        return map
     }
 
     suspend fun loadItemDetails(item: MapItem): ItemDetails? = withContext(Dispatchers.IO) {
@@ -105,66 +140,6 @@ class EncounterRepository(private val context: Context) {
         return map
     }
 
-    private fun buildEvolutionTree(node: JSONObject): EvolutionNode {
-        val name = cleanName(node.getJSONObject("species").getString("name"))
-        val evolvesTo = node.optJSONArray("evolves_to") ?: return EvolutionNode(name)
-        val branches = buildList {
-            for (i in 0 until evolvesTo.length()) {
-                val child = evolvesTo.getJSONObject(i)
-                val childSlug = child.getJSONObject("species").getString("name")
-                // Only keep evolutions obtainable in Emerald (national dex <= 386).
-                if (SpeciesCatalog.spriteIdForName(context, childSlug) == null) continue
-                val details = child.optJSONArray("evolution_details")?.optJSONObject(0)
-                val condition = evolutionCondition(details)
-                add(EvolutionBranch(condition, buildEvolutionTree(child)))
-            }
-        }
-        return EvolutionNode(name, branches)
-    }
-
-    private fun evolutionCondition(details: JSONObject?): String {
-        if (details == null) return ""
-        val trigger = details.optJSONObject("trigger")?.optString("name")
-        return when (trigger) {
-            "level-up" -> {
-                val level = details.optInt("min_level", 0)
-                val happiness = details.optInt("min_happiness", 0)
-                val beauty = details.optInt("min_beauty", 0)
-                val affection = details.optInt("min_affection", 0)
-                val item = details.optJSONObject("item")?.optString("name")
-                val held = details.optJSONObject("held_item")?.optString("name")
-                val location = details.optJSONObject("location")?.optString("name")
-                val move = details.optJSONObject("known_move")?.optString("name")
-                val moveType = details.optJSONObject("known_move_type")?.optString("name")
-                val timeOfDay = details.optString("time_of_day", "")
-                when {
-                    level > 0 -> "Nv. $level"
-                    happiness > 0 -> "Amistad alta"
-                    beauty > 0 -> "Belleza alta"
-                    affection > 0 -> "Cariño alto"
-                    item != null -> "Subir nivel con ${cleanName(item)}"
-                    held != null -> "Subir nivel con ${cleanName(held)} equipado"
-                    location != null -> "Nivel en ${cleanName(location)}"
-                    move != null -> "Conocer ${cleanName(move)}"
-                    moveType != null -> "Conocer ataque de tipo ${cleanName(moveType)}"
-                    timeOfDay == "day" -> "De día"
-                    timeOfDay == "night" -> "De noche"
-                    else -> "Subir de nivel"
-                }
-            }
-            "use-item" -> "Usar ${cleanName(details.optJSONObject("item")?.optString("name") ?: "objeto")}"
-            "trade" -> {
-                val held = details.optJSONObject("held_item")?.optString("name")
-                if (!held.isNullOrBlank()) "Intercambio con ${cleanName(held)}" else "Intercambio"
-            }
-            "shed" -> "Forma especial (hueco en equipo)"
-            "other" -> "Forma especial"
-            else -> cleanName(trigger ?: "")
-        }
-    }
-
-    private fun cleanName(name: String): String = name.replace('-', ' ').replaceFirstChar { c -> c.uppercase() }
-
     suspend fun refreshFromWeb(mapId: String): List<Encounter> = withContext(Dispatchers.IO) {
         runCatching {
             val slug = apiAreaSlug(mapId)
@@ -186,12 +161,12 @@ class EncounterRepository(private val context: Context) {
                         if (details.length() == 0) continue
                         val detail = details.getJSONObject(0)
                         val method = detail.getJSONObject("method").getString("name")
-                        val label = if (method == "surf") "Agua" else "Hierba"
+                        val label = if (method == "surf") "Water" else "Grass"
                         add(Encounter(
                             item.getJSONObject("pokemon").getString("name").replace('-', ' ').replaceFirstChar { it.uppercase() },
                             label,
                             detail.getInt("chance"),
-                            "Nv. ${detail.getInt("min_level")}–${detail.getInt("max_level")}",
+                            "Lv. ${detail.getInt("min_level")}–${detail.getInt("max_level")}",
                             item.getJSONObject("pokemon").getString("url").trimEnd('/').substringAfterLast('/').toIntOrNull()
                         ))
                         break
@@ -306,7 +281,7 @@ class EncounterRepository(private val context: Context) {
                 name = species.split('_').joinToString(" ") { it.lowercase().replaceFirstChar { character -> character.uppercase() } },
                 type = category.displayName(),
                 rate = slotRates.getOrElse(index) { 1 },
-                level = "Nv. ${mon.optInt("min_level")}–${mon.optInt("max_level")}",
+                level = "Lv. ${mon.optInt("min_level")}–${mon.optInt("max_level")}",
                 spriteId = speciesIds?.optJSONArray("results")?.let { results ->
                     val apiName = species.lowercase().replace('_', '-').replace(' ', '-')
                     (0 until results.length()).firstOrNull { index -> results.getJSONObject(index).optString("name") == apiName }?.plus(1)
@@ -320,8 +295,8 @@ class EncounterRepository(private val context: Context) {
     }
 
     private fun EncounterCategory.displayName(): String = when (this) {
-        EncounterCategory.GRASS -> "Hierba"
-        EncounterCategory.FISHING -> "Pesca"
+        EncounterCategory.GRASS -> "Grass"
+        EncounterCategory.FISHING -> "Fishing"
         EncounterCategory.SURF -> "Surf"
     }
 
@@ -352,7 +327,7 @@ class EncounterRepository(private val context: Context) {
                             "walk" -> EncounterCategory.GRASS
                             else -> null
                         } ?: continue
-                        val candidate = CategorizedEncounter(name, category.name, detail.getInt("chance"), "Nv. ${detail.getInt("min_level")}–${detail.getInt("max_level")}", spriteId, category)
+                        val candidate = CategorizedEncounter(name, category.name, detail.getInt("chance"), "Lv. ${detail.getInt("min_level")}–${detail.getInt("max_level")}", spriteId, category)
                         val existing = grouped.getOrPut(category) { mutableMapOf() }[name]
                         if (existing == null || candidate.rate > existing.rate) grouped.getValue(category)[name] = candidate
                     }
@@ -380,21 +355,21 @@ data class MapContent(
 )
 object EncounterCatalog {
     val route101 = listOf(
-        Encounter("Poochyena", "Siniestro", 45, "Nv. 2–3"),
-        Encounter("Zigzagoon", "Normal", 45, "Nv. 2–3"),
-        Encounter("Wurmple", "Bicho", 10, "Nv. 2–3")
+        Encounter("Poochyena", "Dark", 45, "Lv. 2–3"),
+        Encounter("Zigzagoon", "Normal", 45, "Lv. 2–3"),
+        Encounter("Wurmple", "Bug", 10, "Lv. 2–3")
     )
     private val route102 = listOf(
-        Encounter("Zigzagoon", "Normal", 30, "Nv. 3–4"),
-        Encounter("Poochyena", "Siniestro", 30, "Nv. 3–4"),
-        Encounter("Ralts", "Psíquico", 4, "Nv. 4–5"),
-        Encounter("Seedot", "Planta", 20, "Nv. 3–5")
+        Encounter("Zigzagoon", "Normal", 30, "Lv. 3–4"),
+        Encounter("Poochyena", "Dark", 30, "Lv. 3–4"),
+        Encounter("Ralts", "Psychic", 4, "Lv. 4–5"),
+        Encounter("Seedot", "Grass", 20, "Lv. 3–5")
     )
         private val route103 = listOf(
-            Encounter("Poochyena", "Siniestro", 30, "Nv. 2–4", 261),
-            Encounter("Zigzagoon", "Normal", 20, "Nv. 2–4", 263),
-            Encounter("Wingull", "Agua/Volador", 30, "Nv. 2–4", 278),
-            Encounter("Lotad", "Agua/Planta", 20, "Nv. 2–4", 270)
+            Encounter("Poochyena", "Dark", 30, "Lv. 2–4", 261),
+            Encounter("Zigzagoon", "Normal", 20, "Lv. 2–4", 263),
+            Encounter("Wingull", "Water/Flying", 30, "Lv. 2–4", 278),
+            Encounter("Lotad", "Water/Grass", 20, "Lv. 2–4", 270)
         )
 
     fun forMap(mapId: String): List<Encounter> = when (mapId) {
@@ -405,9 +380,9 @@ object EncounterCatalog {
     }
 
     fun nameFor(mapId: String): String = when (mapId) {
-        "MAP_ROUTE101" -> "Ruta 101"
-        "MAP_ROUTE102" -> "Ruta 102"
-        else -> "Mapa desconocido"
+        "MAP_ROUTE101" -> "Route 101"
+        "MAP_ROUTE102" -> "Route 102"
+        else -> "Unknown map"
     }
 
     fun groupedFor(mapId: String): Map<EncounterCategory, List<CategorizedEncounter>> = when (mapId) {

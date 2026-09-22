@@ -87,7 +87,7 @@ data class CompanionState(
     val connected: Boolean = false,
     val host: String = "127.0.0.1",
     val port: String = "55355",
-    val mapName: String = "Ruta 101",
+    val mapName: String = "Route 101",
     val mapId: String = "MAP_ROUTE101",
     val encounters: List<Encounter> = EncounterCatalog.route101,
     val categorizedEncounters: Map<EncounterCategory, List<CategorizedEncounter>> = EncounterCatalog.groupedFor("MAP_ROUTE101"),
@@ -97,7 +97,7 @@ data class CompanionState(
     val selectedTab: CompanionTab = CompanionTab.TEAM,
     val detail: DetailState? = null,
     val detailLoading: Boolean = false,
-    val message: String = "Sin conexión",
+    val message: String = "Not connected",
     val logs: List<ConnectionLog> = emptyList(),
     val showLogs: Boolean = false,
     val battle: BattleInfo? = null,
@@ -143,8 +143,8 @@ class CompanionViewModel(application: Application) : AndroidViewModel(applicatio
         val host = _state.value.host
         val port = _state.value.port.toIntOrNull() ?: 55355
         refreshJob = viewModelScope.launch {
-            _state.value = _state.value.copy(message = "Conectando con RetroArch…")
-            addLog("Intentando conectar a $host:$port")
+            _state.value = _state.value.copy(message = "Connecting to RetroArch…")
+            addLog("Attempting to connect to $host:$port")
             var lastMapId: String? = null
             while (true) {
                 val result = client.readMap(host, port) { logLine -> addLog(logLine) }
@@ -160,15 +160,15 @@ class CompanionViewModel(application: Application) : AndroidViewModel(applicatio
                         items = mapData?.items ?: _state.value.items,
                         trainers = mapData?.trainers ?: _state.value.trainers,
                         trades = mapData?.trades ?: _state.value.trades,
-                        message = if (mapChanged) "UDP conectado · mapa actualizado" else "UDP conectado · esperando cambios"
+                        message = if (mapChanged) "UDP connected · map updated" else "UDP connected · waiting for changes"
                     )
                     if (mapChanged) {
-                        addLog("Mapa recibido: ${result.mapId} / ${result.mapName}")
+                        addLog("Map received: ${result.mapId} / ${result.mapName}")
                         lastMapId = result.mapId
                     }
                 } else if (lastMapId == null) {
-                    _state.value = _state.value.copy(message = "No responde RetroArch · revisa UDP Control")
-                    addLog("No se recibió respuesta válida desde RetroArch")
+                    _state.value = _state.value.copy(message = "RetroArch not responding · check UDP Control")
+                    addLog("No valid response from RetroArch")
                     break
                 }
                 pollBattleAndSummary(host, port)
@@ -308,11 +308,11 @@ class CompanionViewModel(application: Application) : AndroidViewModel(applicatio
         refreshJob?.cancel()
         refreshJob = null
         client.close()
-        addLog("Conexión cerrada por el usuario")
+        addLog("Connection closed by user")
         _state.value = _state.value.copy(
             connected = false,
             selectedTab = CompanionTab.TEAM,
-            message = "Desconectado · datos guardados",
+            message = "Disconnected · data saved",
             battle = null,
             team = emptyList()
         )

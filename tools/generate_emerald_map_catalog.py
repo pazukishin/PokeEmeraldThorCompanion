@@ -21,6 +21,39 @@ def display_name(value):
     return " ".join(word.capitalize() for word in words)
 
 
+TM_NUMBERS = {}
+HM_NUMBERS = {}
+
+
+def _load_machines():
+    text = (SOURCE / "include/constants/tms_hms.h").read_text(encoding="utf-8")
+
+    def parse(macro):
+        m = re.search(r"#define " + macro + r"\(F\) \\(.*?)\n\n", text, re.S)
+        return {name: i + 1 for i, name in enumerate(re.findall(r"F\((\w+)\)", m.group(1)))} if m else {}
+
+    TM_NUMBERS.update(parse("FOREACH_TM"))
+    HM_NUMBERS.update(parse("FOREACH_HM"))
+
+
+_load_machines()
+
+
+def resolve_item(item_key):
+    """Return (display name, sprite key) for a pokeemerald ITEM_* constant (without the ITEM_ prefix)."""
+    if item_key.startswith("TM_") and item_key[3:] in TM_NUMBERS:
+        return f"TM{TM_NUMBERS[item_key[3:]]:02d}", "tm-normal"
+    if item_key.startswith("HM_") and item_key[3:] in HM_NUMBERS:
+        return f"HM{HM_NUMBERS[item_key[3:]]:02d}", "hm-normal"
+    if item_key == "X_DEFEND":
+        return "X Defense", "x-defense"
+    if item_key == "X_SPECIAL":
+        return "X Special", "x-sp-atk"
+    if item_key in ("ROOM_1_KEY", "ROOM_2_KEY", "ROOM_4_KEY", "ROOM_6_KEY"):
+        return display_name(item_key), "basement-key"
+    return display_name(item_key), item_key.lower().replace("_", "-")
+
+
 def parse_trainers():
     trainers_text = (SOURCE / "src/data/trainers.h").read_text(encoding="utf-8")
     parties_text = (SOURCE / "src/data/trainer_parties.h").read_text(encoding="utf-8")
@@ -99,10 +132,11 @@ def parse_map(map_file, trainers, trades):
         block = script_blocks.get(script_name, "")
         item_matches = re.findall(r"\b(?:giveitem(?:_with_message)?|finditem)\s+ITEM_([A-Z0-9_]+)(?:\s*,\s*(\d+))?", block)
         for item, quantity in item_matches:
+            item_name, sprite_key = resolve_item(item)
             items.append({
-                "name": display_name(item),
+                "name": item_name,
                 "quantity": int(quantity or 1),
-                "spriteKey": item.lower().replace("_", "-"),
+                "spriteKey": sprite_key,
                 "kind": "item_ball" if event.get("graphics_id") == "OBJ_EVENT_GFX_ITEM_BALL" else "npc_reward",
                 "x": event.get("x"),
                 "y": event.get("y"),
@@ -122,10 +156,11 @@ def parse_map(map_file, trainers, trades):
             item = bg_event.get("item", "")
             if item.startswith("ITEM_"):
                 item_key = item[len("ITEM_"):]
+                item_name, sprite_key = resolve_item(item_key)
                 items.append({
-                    "name": display_name(item_key),
+                    "name": item_name,
                     "quantity": 1,
-                    "spriteKey": item_key.lower().replace("_", "-"),
+                    "spriteKey": sprite_key,
                     "kind": "hidden_item",
                     "x": bg_event.get("x"),
                     "y": bg_event.get("y"),

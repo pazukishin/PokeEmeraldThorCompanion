@@ -1,0 +1,1082 @@
+{
+  "1": [
+    {
+      "condition": "Lv. 16",
+      "target": 2
+    }
+  ],
+  "2": [
+    {
+      "condition": "Lv. 32",
+      "target": 3
+    }
+  ],
+  "4": [
+    {
+      "condition": "Lv. 16",
+      "target": 5
+    }
+  ],
+  "5": [
+    {
+      "condition": "Lv. 36",
+      "target": 6
+    }
+  ],
+  "7": [
+    {
+      "condition": "Lv. 16",
+      "target": 8
+    }
+  ],
+  "8": [
+    {
+      "condition": "Lv. 36",
+      "target": 9
+    }
+  ],
+  "10": [
+    {
+      "condition": "Lv. 7",
+      "target": 11
+    }
+  ],
+  "11": [
+    {
+      "condition": "Lv. 10",
+      "target": 12
+    }
+  ],
+  "13": [
+    {
+      "condition": "Lv. 7",
+      "target": 14
+    }
+  ],
+  "14": [
+    {
+      "condition": "Lv. 10",
+      "target": 15
+    }
+  ],
+  "16": [
+    {
+      "condition": "Lv. 18",
+      "target": 17
+    }
+  ],
+  "17": [
+    {
+      "condition": "Lv. 36",
+      "target": 18
+    }
+  ],
+  "19": [
+    {
+      "condition": "Lv. 20",
+      "target": 20
+    }
+  ],
+  "21": [
+    {
+      "condition": "Lv. 20",
+      "target": 22
+    }
+  ],
+  "23": [
+    {
+      "condition": "Lv. 22",
+      "target": 24
+    }
+  ],
+  "25": [
+    {
+      "condition": "Use Thunder Stone",
+      "target": 26
+    }
+  ],
+  "27": [
+    {
+      "condition": "Lv. 22",
+      "target": 28
+    }
+  ],
+  "29": [
+    {
+      "condition": "Lv. 16",
+      "target": 30
+    }
+  ],
+  "30": [
+    {
+      "condition": "Use Moon Stone",
+      "target": 31
+    }
+  ],
+  "32": [
+    {
+      "condition": "Lv. 16",
+      "target": 33
+    }
+  ],
+  "33": [
+    {
+      "condition": "Use Moon Stone",
+      "target": 34
+    }
+  ],
+  "35": [
+    {
+      "condition": "Use Moon Stone",
+      "target": 36
+    }
+  ],
+  "37": [
+    {
+      "condition": "Use Fire Stone",
+      "target": 38
+    }
+  ],
+  "39": [
+    {
+      "condition": "Use Moon Stone",
+      "target": 40
+    }
+  ],
+  "41": [
+    {
+      "condition": "Lv. 22",
+      "target": 42
+    }
+  ],
+  "42": [
+    {
+      "condition": "High friendship",
+      "target": 169
+    }
+  ],
+  "43": [
+    {
+      "condition": "Lv. 21",
+      "target": 44
+    }
+  ],
+  "44": [
+    {
+      "condition": "Use Leaf Stone",
+      "target": 45
+    },
+    {
+      "condition": "Use Sun Stone",
+      "target": 182
+    }
+  ],
+  "46": [
+    {
+      "condition": "Lv. 24",
+      "target": 47
+    }
+  ],
+  "48": [
+    {
+      "condition": "Lv. 31",
+      "target": 49
+    }
+  ],
+  "50": [
+    {
+      "condition": "Lv. 26",
+      "target": 51
+    }
+  ],
+  "52": [
+    {
+      "condition": "Lv. 28",
+      "target": 53
+    }
+  ],
+  "54": [
+    {
+      "condition": "Lv. 33",
+      "target": 55
+    }
+  ],
+  "56": [
+    {
+      "condition": "Lv. 28",
+      "target": 57
+    }
+  ],
+  "58": [
+    {
+      "condition": "Use Fire Stone",
+      "target": 59
+    }
+  ],
+  "60": [
+    {
+      "condition": "Lv. 25",
+      "target": 61
+    }
+  ],
+  "61": [
+    {
+      "condition": "Use Water Stone",
+      "target": 62
+    },
+    {
+      "condition": "Trade holding King's Rock",
+      "target": 186
+    }
+  ],
+  "63": [
+    {
+      "condition": "Lv. 16",
+      "target": 64
+    }
+  ],
+  "64": [
+    {
+      "condition": "Trade",
+      "target": 65
+    }
+  ],
+  "66": [
+    {
+      "condition": "Lv. 28",
+      "target": 67
+    }
+  ],
+  "67": [
+    {
+      "condition": "Trade",
+      "target": 68
+    }
+  ],
+  "69": [
+    {
+      "condition": "Lv. 21",
+      "target": 70
+    }
+  ],
+  "70": [
+    {
+      "condition": "Use Leaf Stone",
+      "target": 71
+    }
+  ],
+  "72": [
+    {
+      "condition": "Lv. 30",
+      "target": 73
+    }
+  ],
+  "74": [
+    {
+      "condition": "Lv. 25",
+      "target": 75
+    }
+  ],
+  "75": [
+    {
+      "condition": "Trade",
+      "target": 76
+    }
+  ],
+  "77": [
+    {
+      "condition": "Lv. 40",
+      "target": 78
+    }
+  ],
+  "79": [
+    {
+      "condition": "Lv. 37",
+      "target": 80
+    },
+    {
+      "condition": "Trade holding King's Rock",
+      "target": 199
+    }
+  ],
+  "81": [
+    {
+      "condition": "Lv. 30",
+      "target": 82
+    }
+  ],
+  "84": [
+    {
+      "condition": "Lv. 31",
+      "target": 85
+    }
+  ],
+  "86": [
+    {
+      "condition": "Lv. 34",
+      "target": 87
+    }
+  ],
+  "88": [
+    {
+      "condition": "Lv. 38",
+      "target": 89
+    }
+  ],
+  "90": [
+    {
+      "condition": "Use Water Stone",
+      "target": 91
+    }
+  ],
+  "92": [
+    {
+      "condition": "Lv. 25",
+      "target": 93
+    }
+  ],
+  "93": [
+    {
+      "condition": "Trade",
+      "target": 94
+    }
+  ],
+  "95": [
+    {
+      "condition": "Trade holding Metal Coat",
+      "target": 208
+    }
+  ],
+  "96": [
+    {
+      "condition": "Lv. 26",
+      "target": 97
+    }
+  ],
+  "98": [
+    {
+      "condition": "Lv. 28",
+      "target": 99
+    }
+  ],
+  "100": [
+    {
+      "condition": "Lv. 30",
+      "target": 101
+    }
+  ],
+  "102": [
+    {
+      "condition": "Use Leaf Stone",
+      "target": 103
+    }
+  ],
+  "104": [
+    {
+      "condition": "Lv. 28",
+      "target": 105
+    }
+  ],
+  "109": [
+    {
+      "condition": "Lv. 35",
+      "target": 110
+    }
+  ],
+  "111": [
+    {
+      "condition": "Lv. 42",
+      "target": 112
+    }
+  ],
+  "113": [
+    {
+      "condition": "High friendship",
+      "target": 242
+    }
+  ],
+  "116": [
+    {
+      "condition": "Lv. 32",
+      "target": 117
+    }
+  ],
+  "117": [
+    {
+      "condition": "Trade holding Dragon Scale",
+      "target": 230
+    }
+  ],
+  "118": [
+    {
+      "condition": "Lv. 33",
+      "target": 119
+    }
+  ],
+  "120": [
+    {
+      "condition": "Use Water Stone",
+      "target": 121
+    }
+  ],
+  "123": [
+    {
+      "condition": "Trade holding Metal Coat",
+      "target": 212
+    }
+  ],
+  "129": [
+    {
+      "condition": "Lv. 20",
+      "target": 130
+    }
+  ],
+  "133": [
+    {
+      "condition": "Use Thunder Stone",
+      "target": 135
+    },
+    {
+      "condition": "Use Water Stone",
+      "target": 134
+    },
+    {
+      "condition": "Use Fire Stone",
+      "target": 136
+    },
+    {
+      "condition": "High friendship (day)",
+      "target": 196
+    },
+    {
+      "condition": "High friendship (night)",
+      "target": 197
+    }
+  ],
+  "137": [
+    {
+      "condition": "Trade holding Up-Grade",
+      "target": 233
+    }
+  ],
+  "138": [
+    {
+      "condition": "Lv. 40",
+      "target": 139
+    }
+  ],
+  "140": [
+    {
+      "condition": "Lv. 40",
+      "target": 141
+    }
+  ],
+  "147": [
+    {
+      "condition": "Lv. 30",
+      "target": 148
+    }
+  ],
+  "148": [
+    {
+      "condition": "Lv. 55",
+      "target": 149
+    }
+  ],
+  "152": [
+    {
+      "condition": "Lv. 16",
+      "target": 153
+    }
+  ],
+  "153": [
+    {
+      "condition": "Lv. 32",
+      "target": 154
+    }
+  ],
+  "155": [
+    {
+      "condition": "Lv. 14",
+      "target": 156
+    }
+  ],
+  "156": [
+    {
+      "condition": "Lv. 36",
+      "target": 157
+    }
+  ],
+  "158": [
+    {
+      "condition": "Lv. 18",
+      "target": 159
+    }
+  ],
+  "159": [
+    {
+      "condition": "Lv. 30",
+      "target": 160
+    }
+  ],
+  "161": [
+    {
+      "condition": "Lv. 15",
+      "target": 162
+    }
+  ],
+  "163": [
+    {
+      "condition": "Lv. 20",
+      "target": 164
+    }
+  ],
+  "165": [
+    {
+      "condition": "Lv. 18",
+      "target": 166
+    }
+  ],
+  "167": [
+    {
+      "condition": "Lv. 22",
+      "target": 168
+    }
+  ],
+  "170": [
+    {
+      "condition": "Lv. 27",
+      "target": 171
+    }
+  ],
+  "172": [
+    {
+      "condition": "High friendship",
+      "target": 25
+    }
+  ],
+  "173": [
+    {
+      "condition": "High friendship",
+      "target": 35
+    }
+  ],
+  "174": [
+    {
+      "condition": "High friendship",
+      "target": 39
+    }
+  ],
+  "175": [
+    {
+      "condition": "High friendship",
+      "target": 176
+    }
+  ],
+  "177": [
+    {
+      "condition": "Lv. 25",
+      "target": 178
+    }
+  ],
+  "179": [
+    {
+      "condition": "Lv. 15",
+      "target": 180
+    }
+  ],
+  "180": [
+    {
+      "condition": "Lv. 30",
+      "target": 181
+    }
+  ],
+  "183": [
+    {
+      "condition": "Lv. 18",
+      "target": 184
+    }
+  ],
+  "187": [
+    {
+      "condition": "Lv. 18",
+      "target": 188
+    }
+  ],
+  "188": [
+    {
+      "condition": "Lv. 27",
+      "target": 189
+    }
+  ],
+  "191": [
+    {
+      "condition": "Use Sun Stone",
+      "target": 192
+    }
+  ],
+  "194": [
+    {
+      "condition": "Lv. 20",
+      "target": 195
+    }
+  ],
+  "204": [
+    {
+      "condition": "Lv. 31",
+      "target": 205
+    }
+  ],
+  "209": [
+    {
+      "condition": "Lv. 23",
+      "target": 210
+    }
+  ],
+  "216": [
+    {
+      "condition": "Lv. 30",
+      "target": 217
+    }
+  ],
+  "218": [
+    {
+      "condition": "Lv. 38",
+      "target": 219
+    }
+  ],
+  "220": [
+    {
+      "condition": "Lv. 33",
+      "target": 221
+    }
+  ],
+  "223": [
+    {
+      "condition": "Lv. 25",
+      "target": 224
+    }
+  ],
+  "228": [
+    {
+      "condition": "Lv. 24",
+      "target": 229
+    }
+  ],
+  "231": [
+    {
+      "condition": "Lv. 25",
+      "target": 232
+    }
+  ],
+  "236": [
+    {
+      "condition": "Lv. 20 (Atk < Def)",
+      "target": 107
+    },
+    {
+      "condition": "Lv. 20 (Atk > Def)",
+      "target": 106
+    },
+    {
+      "condition": "Lv. 20 (Atk = Def)",
+      "target": 237
+    }
+  ],
+  "238": [
+    {
+      "condition": "Lv. 30",
+      "target": 124
+    }
+  ],
+  "239": [
+    {
+      "condition": "Lv. 30",
+      "target": 125
+    }
+  ],
+  "240": [
+    {
+      "condition": "Lv. 30",
+      "target": 126
+    }
+  ],
+  "246": [
+    {
+      "condition": "Lv. 30",
+      "target": 247
+    }
+  ],
+  "247": [
+    {
+      "condition": "Lv. 55",
+      "target": 248
+    }
+  ],
+  "252": [
+    {
+      "condition": "Lv. 16",
+      "target": 253
+    }
+  ],
+  "253": [
+    {
+      "condition": "Lv. 36",
+      "target": 254
+    }
+  ],
+  "255": [
+    {
+      "condition": "Lv. 16",
+      "target": 256
+    }
+  ],
+  "256": [
+    {
+      "condition": "Lv. 36",
+      "target": 257
+    }
+  ],
+  "258": [
+    {
+      "condition": "Lv. 16",
+      "target": 259
+    }
+  ],
+  "259": [
+    {
+      "condition": "Lv. 36",
+      "target": 260
+    }
+  ],
+  "261": [
+    {
+      "condition": "Lv. 18",
+      "target": 262
+    }
+  ],
+  "263": [
+    {
+      "condition": "Lv. 20",
+      "target": 264
+    }
+  ],
+  "265": [
+    {
+      "condition": "Lv. 7 (Silcoon personality)",
+      "target": 266
+    },
+    {
+      "condition": "Lv. 7 (Cascoon personality)",
+      "target": 268
+    }
+  ],
+  "266": [
+    {
+      "condition": "Lv. 10",
+      "target": 267
+    }
+  ],
+  "268": [
+    {
+      "condition": "Lv. 10",
+      "target": 269
+    }
+  ],
+  "270": [
+    {
+      "condition": "Lv. 14",
+      "target": 271
+    }
+  ],
+  "271": [
+    {
+      "condition": "Use Water Stone",
+      "target": 272
+    }
+  ],
+  "273": [
+    {
+      "condition": "Lv. 14",
+      "target": 274
+    }
+  ],
+  "274": [
+    {
+      "condition": "Use Leaf Stone",
+      "target": 275
+    }
+  ],
+  "290": [
+    {
+      "condition": "Lv. 20",
+      "target": 291
+    },
+    {
+      "condition": "Lv. 20 (Shedinja: empty slot + Poké Ball)",
+      "target": 292
+    }
+  ],
+  "276": [
+    {
+      "condition": "Lv. 22",
+      "target": 277
+    }
+  ],
+  "285": [
+    {
+      "condition": "Lv. 23",
+      "target": 286
+    }
+  ],
+  "278": [
+    {
+      "condition": "Lv. 25",
+      "target": 279
+    }
+  ],
+  "283": [
+    {
+      "condition": "Lv. 22",
+      "target": 284
+    }
+  ],
+  "320": [
+    {
+      "condition": "Lv. 40",
+      "target": 321
+    }
+  ],
+  "300": [
+    {
+      "condition": "Use Moon Stone",
+      "target": 301
+    }
+  ],
+  "343": [
+    {
+      "condition": "Lv. 36",
+      "target": 344
+    }
+  ],
+  "339": [
+    {
+      "condition": "Lv. 30",
+      "target": 340
+    }
+  ],
+  "341": [
+    {
+      "condition": "Lv. 30",
+      "target": 342
+    }
+  ],
+  "349": [
+    {
+      "condition": "Beauty 170+",
+      "target": 350
+    }
+  ],
+  "318": [
+    {
+      "condition": "Lv. 30",
+      "target": 319
+    }
+  ],
+  "328": [
+    {
+      "condition": "Lv. 35",
+      "target": 329
+    }
+  ],
+  "329": [
+    {
+      "condition": "Lv. 45",
+      "target": 330
+    }
+  ],
+  "296": [
+    {
+      "condition": "Lv. 24",
+      "target": 297
+    }
+  ],
+  "309": [
+    {
+      "condition": "Lv. 26",
+      "target": 310
+    }
+  ],
+  "322": [
+    {
+      "condition": "Lv. 33",
+      "target": 323
+    }
+  ],
+  "363": [
+    {
+      "condition": "Lv. 32",
+      "target": 364
+    }
+  ],
+  "364": [
+    {
+      "condition": "Lv. 44",
+      "target": 365
+    }
+  ],
+  "331": [
+    {
+      "condition": "Lv. 32",
+      "target": 332
+    }
+  ],
+  "361": [
+    {
+      "condition": "Lv. 42",
+      "target": 362
+    }
+  ],
+  "298": [
+    {
+      "condition": "High friendship",
+      "target": 183
+    }
+  ],
+  "325": [
+    {
+      "condition": "Lv. 32",
+      "target": 326
+    }
+  ],
+  "307": [
+    {
+      "condition": "Lv. 37",
+      "target": 308
+    }
+  ],
+  "333": [
+    {
+      "condition": "Lv. 35",
+      "target": 334
+    }
+  ],
+  "360": [
+    {
+      "condition": "Lv. 15",
+      "target": 202
+    }
+  ],
+  "355": [
+    {
+      "condition": "Lv. 37",
+      "target": 356
+    }
+  ],
+  "287": [
+    {
+      "condition": "Lv. 18",
+      "target": 288
+    }
+  ],
+  "288": [
+    {
+      "condition": "Lv. 36",
+      "target": 289
+    }
+  ],
+  "316": [
+    {
+      "condition": "Lv. 26",
+      "target": 317
+    }
+  ],
+  "293": [
+    {
+      "condition": "Lv. 20",
+      "target": 294
+    }
+  ],
+  "294": [
+    {
+      "condition": "Lv. 40",
+      "target": 295
+    }
+  ],
+  "366": [
+    {
+      "condition": "Trade holding Deep Sea Tooth",
+      "target": 367
+    },
+    {
+      "condition": "Trade holding Deep Sea Scale",
+      "target": 368
+    }
+  ],
+  "353": [
+    {
+      "condition": "Lv. 37",
+      "target": 354
+    }
+  ],
+  "304": [
+    {
+      "condition": "Lv. 32",
+      "target": 305
+    }
+  ],
+  "305": [
+    {
+      "condition": "Lv. 42",
+      "target": 306
+    }
+  ],
+  "345": [
+    {
+      "condition": "Lv. 40",
+      "target": 346
+    }
+  ],
+  "347": [
+    {
+      "condition": "Lv. 40",
+      "target": 348
+    }
+  ],
+  "280": [
+    {
+      "condition": "Lv. 20",
+      "target": 281
+    }
+  ],
+  "281": [
+    {
+      "condition": "Lv. 30",
+      "target": 282
+    }
+  ],
+  "371": [
+    {
+      "condition": "Lv. 30",
+      "target": 372
+    }
+  ],
+  "372": [
+    {
+      "condition": "Lv. 50",
+      "target": 373
+    }
+  ],
+  "374": [
+    {
+      "condition": "Lv. 20",
+      "target": 375
+    }
+  ],
+  "375": [
+    {
+      "condition": "Lv. 45",
+      "target": 376
+    }
+  ]
+}

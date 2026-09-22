@@ -528,24 +528,10 @@ object EmeraldMapCatalog {
         put(group to number, EmeraldMap(id, displayName(name)))
     }
 
-    private fun displayName(name: String): String = when {
-        name.startsWith("Route ") -> name.replace("Route ", "Ruta ")
-        name == "Petalburg City" -> "Ciudad Petalburg"
-        name == "Slateport City" -> "Ciudad Portual"
-        name == "Mauville City" -> "Ciudad Malvalona"
-        name == "Rustboro City" -> "Ciudad Férrica"
-        name == "Littleroot Town" -> "Pueblo Raíz"
-        name == "Oldale Town" -> "Pueblo Escaso"
-        name == "Dewford Town" -> "Pueblo Azuliza"
-        name == "Lavaridge Town" -> "Pueblo Lavacalda"
-        name == "Fallarbor Town" -> "Pueblo Pardal"
-        name == "Verdanturf Town" -> "Pueblo Verdegal"
-        name == "Pacifidlog Town" -> "Pueblo Oromar"
-        else -> name
-    }
+    private fun displayName(name: String): String = name
 
     fun resolveMapId(mapGroup: Int, mapNumber: Int): EmeraldMap = entries[mapGroup to mapNumber]
-        ?: EmeraldMap("UNKNOWN_GROUP_${mapGroup}_MAP_${mapNumber}", "Mapa desconocido ($mapGroup:$mapNumber)")
+        ?: EmeraldMap("UNKNOWN_GROUP_${mapGroup}_MAP_${mapNumber}", "Unknown map ($mapGroup:$mapNumber)")
 
     fun fromMemoryValue(value: Int): EmeraldMap = resolveMapId((value ushr 8) and 0xFF, value and 0xFF)
 }

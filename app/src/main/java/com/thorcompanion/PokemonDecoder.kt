@@ -24,13 +24,13 @@ object PokemonDecoder {
         intArrayOf(2, 1, 3, 0), intArrayOf(3, 1, 2, 0), intArrayOf(2, 3, 1, 0), intArrayOf(3, 2, 1, 0)
     )
 
-    /** Spanish nature names, indexed by nature id (personality % 25). */
+    /** English nature names, indexed by nature id (personality % 25). */
     val natureNames = listOf(
-        "Fuerte", "Huraña", "Audaz", "Firme", "Pícara",
-        "Osada", "Dócil", "Plácida", "Agitada", "Floja",
-        "Miedosa", "Activa", "Seria", "Alegre", "Ingenua",
-        "Modesta", "Afable", "Mansa", "Tímida", "Alocada",
-        "Serena", "Amable", "Grosera", "Cauta", "Rara"
+        "Hardy", "Lonely", "Brave", "Adamant", "Naughty",
+        "Bold", "Docile", "Relaxed", "Impish", "Lax",
+        "Timid", "Hasty", "Serious", "Jolly", "Naive",
+        "Modest", "Mild", "Quiet", "Bashful", "Rash",
+        "Calm", "Gentle", "Sassy", "Careful", "Quirky"
     )
 
     /** gNatureStatTable (src/pokemon.c): rows are nature id, columns are [Atk, Def, Spe, SpA, SpD]. */
@@ -45,8 +45,8 @@ object PokemonDecoder {
     )
 
     private val hiddenPowerTypes = listOf(
-        "Lucha", "Volador", "Veneno", "Tierra", "Roca", "Bicho", "Fantasma", "Acero",
-        "Fuego", "Agua", "Planta", "Eléctrico", "Psíquico", "Hielo", "Dragón", "Siniestro"
+        "Fighting", "Flying", "Poison", "Ground", "Rock", "Bug", "Ghost", "Steel",
+        "Fire", "Water", "Grass", "Electric", "Psychic", "Ice", "Dragon", "Dark"
     )
 
     data class IvSpread(
@@ -173,10 +173,10 @@ object PokemonDecoder {
 
     fun natureName(nature: Int): String = natureNames[nature.coerceIn(0, 24)]
 
-    /** Human-readable stat modifier, e.g. "+Atq −Def", or "" for neutral natures. */
+    /** Human-readable stat modifier, e.g. "+Atk −Def", or "" for neutral natures. */
     fun natureModifier(nature: Int): String {
         val table = natureStatTable[nature.coerceIn(0, 24)]
-        val labels = listOf("Atq", "Def", "Vel", "AtEsp", "DefEsp")
+        val labels = listOf("Atk", "Def", "Spe", "SpA", "SpD")
         val boosted = mutableListOf<String>()
         val hindered = mutableListOf<String>()
         for (i in table.indices) {
