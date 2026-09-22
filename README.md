@@ -39,8 +39,11 @@ Configured for **Pokémon Emerald Version 1.0 (USA)**, the version used in Retro
 with the **V.GBA-Next** core.
 
 ### RetroArch
-Enable `Settings > Network > Network Control Interface` (memory reading must be allowed) and
+Enable `Settings > Network > Network Control Interface or Network Commands` (memory reading must be allowed) and
 configure the UDP port used by the app.
+Caution: Some Retroarch builds show that option, but even if you enable it, it's actually not working.
+You can check if that's the case just by enabling the option, saving the configuration and restarting Retroarch.
+If it's still enabled after restarting, you're good to go, if not, look for another build ;)
 
 ## How to Run
 
