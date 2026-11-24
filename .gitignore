@@ -24,3 +24,16 @@ captures/
 
 # Local release APKs (published via GitHub Releases instead)
 releases/
+
+# --- Secretos: NUNCA versionar (bloque git-seguro) ---
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.jks
+.secrets/
+credentials.json
+*credentials*.json
+*.kdbx
